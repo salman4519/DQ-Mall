@@ -1,0 +1,147 @@
+<%- include('../layouts/header.ejs') %>
+<script>
+    // Image preview
+    function previewImage(input, previewId, changeButtonId) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById(previewId);
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                document.getElementById(changeButtonId).style.display = 'inline-block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    document.getElementById('productImages1').addEventListener('change', function() {
+        previewImage(this, 'preview1', 'changeImage1');
+    });
+
+    document.getElementById('productImages2').addEventListener('change', function() {
+        previewImage(this, 'preview2', 'changeImage2');
+    });
+
+    document.getElementById('productImages3').addEventListener('change', function() {
+        previewImage(this, 'preview3', 'changeImage3');
+    });
+
+    // Clicking the preview image opens the file input
+    document.getElementById('preview1').addEventListener('click', function() {
+        document.getElementById('productImages1').click();
+    });
+
+    document.getElementById('preview2').addEventListener('click', function() {
+        document.getElementById('productImages2').click();
+    });
+
+    document.getElementById('preview3').addEventListener('click', function() {
+        document.getElementById('productImages3').click();
+    });
+
+    // Handle cropper functionality (if you want to add cropping)
+    document.getElementById('cropButton').addEventListener('click', function() {
+        // Implement the cropping logic here using a library like Cropper.js
+        // Hide the cropper and show the final image preview
+    });
+
+    document.getElementById('cancelCropButton').addEventListener('click', function() {
+        // Cancel cropping and reset the image preview
+    });
+</script>
+
+<div class="container-fluid">
+    <div class="main-panel">
+        <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="card-title"><a href="/admin/products" style="text-decoration: none;">Products</a> > Add</h4>
+                        </div>
+                    </div>
+                    <div class="col-12 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Add Product</h4>
+                                <form id="addProductForm" action="/admin/products/add" method="post" enctype="multipart/form-data" class="forms-sample">
+                                    <!-- Product Information -->
+                                    <div class="form-group">
+                                        <label for="productName">Name</label>
+                                        <input type="text" class="form-control" id="productName" name="name" style="background-color: #333; color: white;">
+                                        <p id="name-error" style="color: red; display: none;"></p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="productSize">Size</label>
+                                        <input type="text" class="form-control" id="productSize" name="size" style="background-color: #333; color: white;">
+                                        <p id="size-error" style="color: red; display: none;"></p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="productDescription">Description (25-250 characters)</label>
+                                        <textarea class="form-control" id="productDescription" name="description" rows="4" style="background-color: #333; color: white;"></textarea>
+                                        <p id="description-error" style="color: red; display: none;"></p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="productCategory">Category</label>
+                                        <select class="form-control" id="productCategory" name="categoryId" style="background-color: #333; color: white;">
+                                            <% categories.forEach(category => { %>
+                                                <option value="<%= category._id %>"><%= category.name %></option>
+                                            <% }) %>
+                                        </select>
+                                        <p id="category-error" style="color: red; display: none;"></p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="productQuantity">Quantity</label>
+                                        <input type="number" class="form-control" id="productQuantity" name="quantity" style="background-color: #333; color: white;">
+                                        <p id="quantity-error" style="color: red; display: none;"></p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="productPrice">Price</label>
+                                        <input type="number" class="form-control" id="productPrice" name="price" style="background-color: #333; color: white;">
+                                        <p id="price-error" style="color: red; display: none;"></p>
+                                    </div>
+                                    <!-- Image Upload and Cropping Section -->
+                                    <div class="form-group">
+                                        <h5>Upload Image</h5>
+                                        <label for="productImages1" class="image-label">Image 1</label>
+                                        <input type="file" name="img1" class="file-upload-default" id="productImages1" accept="image/*" style="display: none;">
+                                        <img id="preview1" style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;" src="#" alt="Upload Image 1" />
+                                        <button type="button" id="changeImage1" class="change-image-button" style="display: none;">Change Image</button>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="productImages2" class="image-label">Image 2</label>
+                                        <input type="file" name="img2" class="file-upload-default" id="productImages2" accept="image/*" style="display: none;">
+                                        <img id="preview2" style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;" src="#" alt="Upload Image 2" />
+                                        <button type="button" id="changeImage2" class="change-image-button" style="display: none;">Change Image</button>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="productImages3" class="image-label">Image 3</label>
+                                        <input type="file" name="img3" class="file-upload-default" id="productImages3" accept="image/*" style="display: none;">
+                                        <img id="preview3" style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;" src="#" alt="Upload Image 3" />
+                                        <button type="button" id="changeImage3" class="change-image-button" style="display: none;">Change Image</button>
+                                    </div>
+
+                                    <!-- Cropping Section -->
+                                    <div id="cropperContainer" style="display: none; width: 400px; height: 400px; margin: 0 auto;">
+                                        <img id="cropperImage" src="" alt="Image for cropping" style="max-width: 100%; max-height: 100%;" />
+                                        <div style="margin-top: 10px;">
+                                            <button type="button" id="cropButton" class="btn btn-primary">Crop Image</button>
+                                            <button type="button" id="cancelCropButton" class="btn btn-secondary">Cancel</button>
+                                        </div>
+                                    </div>
+                                    <p id="image-error" style="color: red; display: none;"></p>
+                                    <button type="submit" class="btn btn-success mr-2" id="submitButton">Add Product</button>
+                                    <a href="/admin/products" type="button" class="btn btn-dark">Cancel</a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../layouts/footer.ejs') %>

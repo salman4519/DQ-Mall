@@ -1,0 +1,118 @@
+<%- include('../layouts/header.ejs') %>
+
+<div class="container-fluid page-body-wrapper">
+  <div class="main-panel">
+    <div class="content-wrapper">
+      <div class="row">
+        <div class="col-lg-12 grid-margin stretch-card">
+          <div class="card">
+            <div class="card-body">
+              <h4 class="card-title">Edit Product</h4>
+              <form action="/admin/products/update/<%= product._id %>" method="POST" enctype="multipart/form-data">
+                <!-- Product Information -->
+                <div class="form-group">
+                  <label for="productName">Name</label>
+                  <input type="text" class="form-control" id="productName" name="name" value="<%= product.Name %>" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="productSize">Size</label>
+                  <input type="text" class="form-control" id="productSize" name="size" value="<%= product.Size %>" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="productDescription">Description</label>
+                  <textarea class="form-control" id="productDescription" name="description" rows="4" required><%= product.Description %></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="productCategory">Category</label>
+                  <select class="form-control" id="productCategory" name="categoryId" required>
+                    <% categories.forEach(category => { %>
+                      <option value="<%= category._id %>" <%= product.CategoryId._id.equals(category._id) ? 'selected' : '' %>><%= category.name %></option>
+                    <% }) %>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="productPrice">Price</label>
+                  <input type="number" class="form-control" id="productPrice" name="price" value="<%= product.Price %>" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="productQuantity">Quantity</label>
+                  <input type="number" class="form-control" id="productQuantity" name="quantity" value="<%= product.Quantity %>" required>
+                </div>
+
+                <!-- Product Image Uploads with Previews -->
+                <div class="form-group">
+                  <label for="productImage1">Image 1</label>
+                  <input type="file" class="form-control-file" id="productImage1" name="image1" accept="image/*">
+                  <% if (product.Images[0]) { %>
+                    <img id="imagePreview1" src="/uploads/<%= product.Images[0] %>" alt="Current Image 1" style="display: block; width: 150px; height: 150px; margin-top: 10px; object-fit: cover;" />
+                  <% } else { %>
+                    <img id="imagePreview1" src="#" alt="Selected Image 1" style="display: none; width: 150px; height: 150px; margin-top: 10px; object-fit: cover;" />
+                  <% } %>
+                </div>
+
+                <div class="form-group">
+                  <label for="productImage2">Image 2</label>
+                  <input type="file" class="form-control-file" id="productImage2" name="image2" accept="image/*">
+                  <% if (product.Images[1]) { %>
+                    <img id="imagePreview2" src="/uploads/<%= product.Images[1] %>" alt="Current Image 2" style="display: block; width: 150px; height: 150px; margin-top: 10px; object-fit: cover;" />
+                  <% } else { %>
+                    <img id="imagePreview2" src="#" alt="Selected Image 2" style="display: none; width: 150px; height: 150px; margin-top: 10px; object-fit: cover;" />
+                  <% } %>
+                </div>
+
+                <div class="form-group">
+                  <label for="productImage3">Image 3</label>
+                  <input type="file" class="form-control-file" id="productImage3" name="image3" accept="image/*">
+                  <% if (product.Images[2]) { %>
+                    <img id="imagePreview3" src="/uploads/<%= product.Images[2] %>" alt="Current Image 3" style="display: block; width: 150px; height: 150px; margin-top: 10px; object-fit: cover;" />
+                  <% } else { %>
+                    <img id="imagePreview3" src="#" alt="Selected Image 3" style="display: none; width: 150px; height: 150px; margin-top: 10px; object-fit: cover;" />
+                  <% } %>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update Product</button>
+                <a href="/admin/products" class="btn btn-dark">Cancel</a>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../layouts/footer.ejs') %>
+
+<script>
+    // Image preview function for multiple images
+    function previewImage(input, previewId) {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById(previewId);
+                img.src = e.target.result;
+                img.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Event listeners for the 3 image inputs
+    document.getElementById('productImage1').addEventListener('change', function() {
+        previewImage(this, 'imagePreview1');
+    });
+
+    document.getElementById('productImage2').addEventListener('change', function() {
+        previewImage(this, 'imagePreview2');
+    });
+
+    document.getElementById('productImage3').addEventListener('change', function() {
+        previewImage(this, 'imagePreview3');
+    });
+</script>

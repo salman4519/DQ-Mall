@@ -1,0 +1,304 @@
+<%- include('../layouts/header.ejs') %>
+
+<%- include('../layouts/sidebar.ejs') %>
+
+<!-- partial -->
+<div class="container-fluid page-body-wrapper">
+  <!-- partial:partials/_navbar.html -->
+  <nav class="navbar p-0 fixed-top d-flex flex-row">
+    <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+      <a class="navbar-brand brand-logo-mini" href="index.html"><img src="/admin/assets/images/logo-mini.svg" alt="logo" /></a>
+    </div>
+    <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+      <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+        <span class="mdi mdi-menu"></span>
+      </button>
+      <ul class="navbar-nav w-100">
+        <li class="nav-item w-100">
+          <form class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
+            <input type="text" class="form-control" placeholder="Search products">
+          </form>
+        </li>
+      </ul>
+      <ul class="navbar-nav navbar-nav-right">
+        <li class="nav-item dropdown d-none d-lg-block">
+          <a class="nav-link btn btn-success create-new-button" href="/admin/products/add">+ Create New Product</a>
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="createbuttonDropdown">
+            <h6 class="p-3 mb-0">Projects</h6>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item preview-item">
+              <div class="preview-thumbnail">
+                <div class="preview-icon bg-dark rounded-circle">
+                  <i class="mdi mdi-file-outline text-primary"></i>
+                </div>
+              </div>
+              <div class="preview-item-content">
+                <p class="preview-subject ellipsis mb-1">Software Development</p>
+              </div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item preview-item">
+              <div class="preview-thumbnail">
+                <div class="preview-icon bg-dark rounded-circle">
+                  <i class="mdi mdi-web text-info"></i>
+                </div>
+              </div>
+              <div class="preview-item-content">
+                <p class="preview-subject ellipsis mb-1">UI Development</p>
+              </div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item preview-item">
+              <div class="preview-thumbnail">
+                <div class="preview-icon bg-dark rounded-circle">
+                  <i class="mdi mdi-layers text-danger"></i>
+                </div>
+              </div>
+              <div class="preview-item-content">
+                <p class="preview-subject ellipsis mb-1">Software Testing</p>
+              </div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <p class="p-3 mb-0 text-center">See all projects</p>
+          </div>
+        </li>
+        <li class="nav-item nav-settings d-none d-lg-block">
+          <a class="nav-link" href="#">
+            <i class="mdi mdi-view-grid"></i>
+          </a>
+        </li>
+        <li class="nav-item dropdown border-left">
+          <a class="nav-link count-indicator dropdown-toggle" id="messageDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
+            <i class="mdi mdi-email"></i>
+            <span class="count bg-success"></span>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="messageDropdown">
+            <h6 class="p-3 mb-0">Messages</h6>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item preview-item">
+              <div class="preview-thumbnail">
+                <img src="/admin/assets/images/faces/face4.jpg" alt="image" class="rounded-circle profile-pic">
+              </div>
+              <div class="preview-item-content">
+                <p class="preview-subject ellipsis mb-1">Mark send you a message</p>
+                <p class="text-muted mb-0"> 1 Minutes ago </p>
+              </div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item preview-item">
+              <div class="preview-thumbnail">
+                <img src="/admin/assets/images/faces/face2.jpg" alt="image" class="rounded-circle profile-pic">
+              </div>
+              <div class="preview-item-content">
+                <p class="preview-subject ellipsis mb-1">Cregh send you a message</p>
+                <p class="text-muted mb-0"> 15 Minutes ago </p>
+              </div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item preview-item">
+              <div class="preview-thumbnail">
+                <img src="/admin/assets/images/faces/face3.jpg" alt="image" class="rounded-circle profile-pic">
+              </div>
+              <div class="preview-item-content">
+                <p class="preview-subject ellipsis mb-1">Profile picture updated</p>
+                <p class="text-muted mb-0"> 18 Minutes ago </p>
+              </div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <p class="p-3 mb-0 text-center">4 new messages</p>
+          </div>
+        </li>
+        <li class="nav-item dropdown border-left">
+          <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
+            <i class="mdi mdi-bell"></i>
+            <span class="count bg-danger"></span>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
+            <h6 class="p-3 mb-0">Notifications</h6>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item preview-item">
+              <div class="preview-thumbnail">
+                <div class="preview-icon bg-dark rounded-circle">
+                  <i class="mdi mdi-calendar text-success"></i>
+                </div>
+              </div>
+              <div class="preview-item-content">
+                <p class="preview-subject mb-1">Event today</p>
+                <p class="text-muted ellipsis mb-0"> Just a reminder that you have an event today </p>
+              </div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item preview-item">
+              <div class="preview-thumbnail">
+                <div class="preview-icon bg-dark rounded-circle">
+                  <i class="mdi mdi-settings text-danger"></i>
+                </div>
+              </div>
+              <div class="preview-item-content">
+                <p class="preview-subject mb-1">Settings</p>
+                <p class="text-muted ellipsis mb-0"> Update dashboard </p>
+              </div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item preview-item">
+              <div class="preview-thumbnail">
+                <div class="preview-icon bg-dark rounded-circle">
+                  <i class="mdi mdi-link-variant text-warning"></i>
+                </div>
+              </div>
+              <div class="preview-item-content">
+                <p class="preview-subject mb-1">Launch Admin</p>
+                <p class="text-muted ellipsis mb-0"> New admin wow! </p>
+              </div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <p class="p-3 mb-0 text-center">See all notifications</p>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
+            <div class="navbar-profile">
+              <img class="img-xs rounded-circle" src="/admin/assets/images/faces/face15.jpg" alt="">
+              <p class="mb-0 d-none d-sm-block navbar-profile-name">Henry Klein</p>
+              <i class="mdi mdi-menu-down d-none d-sm-block"></i>
+            </div>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="profileDropdown">
+            <h6 class="p-3 mb-0">Profile</h6>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item preview-item">
+              <div class="preview-thumbnail">
+                <div class="preview-icon bg-dark rounded-circle">
+                  <i class="mdi mdi-settings text-success"></i>
+                </div>
+              </div>
+              <div class="preview-item-content">
+                <p class="preview-subject mb-1">Settings</p>
+              </div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item preview-item">
+              <div class="preview-thumbnail">
+                <div class="preview-icon bg-dark rounded-circle">
+                  <i class="mdi mdi-logout text-danger"></i>
+                </div>
+              </div>
+              <div class="preview-item-content">
+                <p class="preview-subject mb-1">Log out</p>
+              </div>
+            </a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- main -->
+  <div class="main-panel">
+    <div class="content-wrapper">
+      <!-- upper image -->
+      <div class="row">
+        <div class="col-12 grid-margin stretch-card">
+          <div class="card corona-gradient-card">
+            <div class="card-body py-0 px-0 px-sm-3">
+              <div class="row align-items-center">
+                <div class="col-4 col-sm-3 col-xl-2">
+                  <img src="/admin/assets/images/dashboard/Group126@2x.png" class="gradient-corona-img img-fluid" alt="">
+                </div>
+                <div class="col-5 col-sm-7 col-xl-8 p-0">
+                  <h3 class="mb-1 mb-sm-0">Product Management</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- users table -->
+      <div class="row">
+        <div class="col-12 grid-margin stretch-card">
+          <div class="card">
+            <div class="card-body">
+              <h4 class="card-title">products</h4>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th style="width: 50px;">S.No</th>
+                      <th style="width: 150px;">Name</th>
+                      <th style="width: 100px;">Size</th>
+                      <th style="width: 100px;">Price</th>
+                      <th style="width: 200px;">Description</th>
+                      <th style="width: 150px;">Category</th>
+                      <th style="width: 200px;">Images</th>
+                      <th style="width: 150px;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if(products.length > 0) { %>
+                      <% products.forEach((product, index) => { %>
+                        <tr>
+                          <td><%= (currentPage - 1) * limit + index + 1 %></td> <!-- Adjusted for pagination -->
+                          <td><%= product.Name %></td>
+                          <td><%= product.Size %></td>
+                          <td><%= product.Price %></td>
+                          <td><%= product.Description %></td>
+                          <td>
+                            <% if (product.CategoryId) { %>
+                                <%= product.CategoryId.name %>
+                            <% } else { %>
+                                <span>Category Not Available</span>
+                            <% } %>
+                        </td> <!-- Assuming CategoryId is populated -->
+                          <td>
+                            <% product.Images.forEach(image => { %>
+                              <img src="/uploads/<%= image %>" alt="Product Image" style="width: 50px; height: 50px;"/>
+                            <% }) %>
+                          </td>
+                          <td>
+                            <a class="btn btn-outline-primary" href="/admin/products/edit/<%= product._id %>">Edit</a>
+                            <a class="btn btn-outline-danger" href="/admin/products/delete/<%= product._id %>">Unlist</a>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    <% } else { %>
+                      <tr>
+                        <td colspan="8">No products found</td>
+                      </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- //padination -->
+      <div class="pagination-container">
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center">
+            <% if (currentPage > 1) { %>
+              <li class="page-item">
+                <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+            <% } %>
+            <% for (let i = 1; i <= totalPages; i++) { %>
+              <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+              </li>
+            <% } %>
+            <% if (currentPage < totalPages) { %>
+              <li class="page-item">
+                <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            <% } %>
+          </ul>
+        </nav>
+      </div>
+      
+
+<%- include('../layouts/footer.ejs') %>

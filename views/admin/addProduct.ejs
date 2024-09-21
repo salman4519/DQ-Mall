@@ -1,0 +1,208 @@
+<%- include('../layouts/header.ejs') %>
+
+<div class="container-fluid">
+    <div class="main-panel">
+        <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="card-title"><a href="/admin/products" style="text-decoration: none;">Products</a> > Add</h4>
+                        </div>
+                    </div>
+                    <div class="col-12 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Add Product</h4>
+                                <form action="/admin/products/add" method="POST" enctype="multipart/form-data">
+                                    <!-- Product Information -->
+                                    <div class="form-group">
+                                        <label for="productName">Name</label>
+                                        <input type="text" class="form-control" id="productName" name="name" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="productSize">Size</label>
+                                        <input type="text" class="form-control" id="productSize" name="size">
+                                    </div>
+                                
+                                    <div class="form-group">
+                                        <label for="productDescription">Description</label>
+                                        <textarea class="form-control" id="productDescription" name="description"></textarea>
+                                    </div>
+                                
+                                    <div class="form-group">
+                                        <label for="productCategory">Category</label>
+                                        <select class="form-control" id="productCategory" name="categoryId">
+                                            <% categories.forEach(category => { %>
+                                                <option value="<%= category._id %>"><%= category.name %></option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                
+                                    <div class="form-group">
+                                        <label for="productPrice">Price</label>
+                                        <input type="number" class="form-control" id="productPrice" name="price" required>
+                                    </div>
+                                
+                                    <div class="form-group">
+                                        <label for="productQuantity">Quantity</label>
+                                        <input type="number" class="form-control" id="productQuantity" name="quantity" required>
+                                    </div>
+                                
+                                    <!-- Product Image Uploads with Previews and Cropping -->
+                                    <div class="form-group">
+                                        <label for="productImage1">Image 1</label>
+                                        <input type="file" class="form-control-file" id="productImage1" name="image1" accept="image/*">
+                                        <img id="imagePreview1" src="#" alt="Selected Image 1" style="display: none; width: 150px; height: 150px; margin-top: 10px; object-fit: cover;" />
+                                        <button type="button" class="btn btn-secondary" id="cropBtn1" style="display:none;" data-toggle="modal" data-target="#cropModal1">Crop Image</button>
+                                    </div>
+
+                                    <!-- Crop Modal for Image 1 -->
+                                    <div class="modal fade" id="cropModal1" tabindex="-1" role="dialog" aria-labelledby="cropModalLabel1" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="cropModalLabel1">Crop Image 1</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <img id="cropImage1" src="#" alt="Image to crop" style="width:100%; max-height:400px;" />
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                    <button type="button" class="btn btn-primary" id="saveCropBtn1">Save Crop</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="productImage2">Image 2</label>
+                                        <input type="file" class="form-control-file" id="productImage2" name="image2" accept="image/*">
+                                        <img id="imagePreview2" src="#" alt="Selected Image 2" style="display: none; width: 150px; height: 150px; margin-top: 10px; object-fit: cover;" />
+                                        <button type="button" class="btn btn-secondary" id="cropBtn2" style="display:none;" data-toggle="modal" data-target="#cropModal2">Crop Image</button>
+                                    </div>
+
+                                    <!-- Crop Modal for Image 2 -->
+                                    <div class="modal fade" id="cropModal2" tabindex="-1" role="dialog" aria-labelledby="cropModalLabel2" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="cropModalLabel2">Crop Image 2</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <img id="cropImage2" src="#" alt="Image to crop" style="width:100%; max-height:400px;" />
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                    <button type="button" class="btn btn-primary" id="saveCropBtn2">Save Crop</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="productImage3">Image 3</label>
+                                        <input type="file" class="form-control-file" id="productImage3" name="image3" accept="image/*">
+                                        <img id="imagePreview3" src="#" alt="Selected Image 3" style="display: none; width: 150px; height: 150px; margin-top: 10px; object-fit: cover;" />
+                                        <button type="button" class="btn btn-secondary" id="cropBtn3" style="display:none;" data-toggle="modal" data-target="#cropModal3">Crop Image</button>
+                                    </div>
+
+                                    <!-- Crop Modal for Image 3 -->
+                                    <div class="modal fade" id="cropModal3" tabindex="-1" role="dialog" aria-labelledby="cropModalLabel3" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="cropModalLabel3">Crop Image 3</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <img id="cropImage3" src="#" alt="Image to crop" style="width:100%; max-height:400px;" />
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                    <button type="button" class="btn btn-primary" id="saveCropBtn3">Save Crop</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                
+                                    <button type="submit" class="btn btn-primary">Add Product</button>
+                                </form>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../layouts/footer.ejs') %>
+
+<!-- Include Cropper.js -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+<script>
+    function setupCropper(inputId, previewId, cropModalId, cropImageId, cropBtnId, saveCropBtnId) {
+    let cropper;
+    
+    document.getElementById(inputId).addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById(cropImageId).src = e.target.result;
+                document.getElementById(previewId).src = e.target.result;
+                document.getElementById(previewId).style.display = 'block';
+                document.getElementById(cropBtnId).style.display = 'block';
+
+                // Initialize Cropper.js
+                if (cropper) {
+                    cropper.destroy(); // Destroy any existing cropper instance
+                }
+                cropper = new Cropper(document.getElementById(cropImageId), {
+                    aspectRatio: 1, // Set aspect ratio or remove for free cropping
+                    viewMode: 1,
+                    preview: `#${previewId}`
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById(saveCropBtnId).addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default if needed
+    if (cropper) {
+        const canvas = cropper.getCroppedCanvas();
+        if (canvas) {
+            document.getElementById(previewId).src = canvas.toDataURL(); // Update preview image
+            $(`#${cropModalId}`).modal('hide').on('hidden.bs.modal', function () {
+            $('.modal-backdrop').remove();
+             }); // Hide the modal using Bootstrap's method
+        } else {
+            console.error('Failed to get cropped canvas');
+        }
+    } else {
+        console.error('Cropper instance not initialized');
+    }
+});
+
+}
+
+// Initialize cropper for each image
+setupCropper('productImage1', 'imagePreview1', 'cropModal1', 'cropImage1', 'cropBtn1', 'saveCropBtn1');
+setupCropper('productImage2', 'imagePreview2', 'cropModal2', 'cropImage2', 'cropBtn2', 'saveCropBtn2');
+setupCropper('productImage3', 'imagePreview3', 'cropModal3', 'cropImage3', 'cropBtn3', 'saveCropBtn3');
+
+</script>

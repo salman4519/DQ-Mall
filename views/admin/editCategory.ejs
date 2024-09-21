@@ -1,0 +1,47 @@
+<%- include('../layouts/header.ejs') %>
+
+<div class="container-fluid">
+    <div class="main-panel">
+        <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="card-title"><a href="/admin/category" style="text-decoration: none;">Category</a> > Edit</h4>
+                        </div>
+                    </div>
+                    <div class="col-12 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Edit Category</h4>
+                                <form id="editCategoryForm" action="/admin/categories/edit/<%= category._id %>" method="post" enctype="multipart/form-data">
+                                    <!-- Category Information -->
+                                    <div class="form-group">
+                                        <label for="categoryName">Name</label>
+                                        <input type="text" class="form-control" id="categoryName" name="name" value="<%= category.name %>" style="background-color: #333; color: white;" required>
+                                        <p id="name-error" style="color: red; display: none;"></p>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="categoryImage">Image</label>
+                                        <input type="file" class="form-control" id="categoryImage" name="image">
+                                        <% if (category.imageUrl) { %>
+                                            <img src="<%= category.imageUrl %>" alt="<%= category.name %>" style="width: 100px; margin-top: 10px;">
+                                        <% } %>
+                                        <p id="image-error" style="color: red; display: none;"></p>
+                                    </div>
+                                    
+                                    <p id="category-error" style="color: red; display: none;"></p>
+                                    <button type="submit" class="btn btn-success mr-2" id="submitButton">Update Category</button>
+                                    <a href="/admin/category" type="button" class="btn btn-dark">Cancel</a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../layouts/footer.ejs') %>

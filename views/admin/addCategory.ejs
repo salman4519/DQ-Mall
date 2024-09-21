@@ -1,0 +1,63 @@
+<%- include('../layouts/header.ejs') %>
+
+<div class="container-fluid">
+    <div class="main-panel">
+        <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="card-title"><a href="/admin/category" style="text-decoration: none;">Category</a> > Add</h4>
+                        </div>
+                    </div>
+                    <div class="col-12 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Add Category</h4>
+                                <form id="addCategoryForm" action="/admin/category/add" method="post" enctype="multipart/form-data">
+                                    <!-- Category Information -->
+                                    <div class="form-group">
+                                        <label for="categoryName">Name</label>
+                                        <input type="text" class="form-control" id="categoryName" name="name" style="background-color: #333; color: white;" required>
+                                        <p id="name-error" style="color: red; display: none;"></p>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="categoryImage">Image</label>
+                                        <input type="file" class="form-control-file" id="categoryImage" name="image" accept="image/*" onchange="previewImage(event)">
+                                    </div>
+
+                                    <!-- Image Preview -->
+                                    <div class="form-group">
+                                        <img id="imagePreview" src="#" alt="Selected Image" style="max-width: 300px; max-height: 300px; display: none;">
+                                    </div>
+
+                                    <p id="category-error" style="color: red; display: none;"></p>
+                                    <button type="submit" class="btn btn-success mr-2" id="submitButton">Add Category</button>
+                                    <a href="/admin/category" type="button" class="btn btn-dark">Cancel</a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../layouts/footer.ejs') %>
+
+<script>
+    function previewImage(event) {
+        const reader = new FileReader();
+        const imageField = document.getElementById('imagePreview');
+        
+        reader.onload = function(){
+            if (reader.readyState == 2) {
+                imageField.src = reader.result;
+                imageField.style.display = 'block';  // Show the image preview
+            }
+        }
+        reader.readAsDataURL(event.target.files[0]);  // Read the selected file
+    }
+</script>

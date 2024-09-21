@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kenza Store</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .cover-card {
+            position: relative;
+            height: 600px;
+            background: url('/users/images/cover3.jpg') center/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cover-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #fff;
+        }
+        .navbar-brand-logo {
+            height: 50px; /* Adjust the height of the logo */
+            margin-right: 20px;
+        }
+        .category-card {
+            width: 100%; /* Ensure the card takes full width within its column */
+            height: 600px; /* Fixed height for the category card */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid #ddd; /* Optional: Add border for better visibility */
+        }
+        .category-card img {
+            height: 450px; /* Fixed height for the image */
+            object-fit: cover; /* Ensure the image covers the container */
+        }
+        .category-card .card-body {
+            padding: 15px;
+            text-align: center;
+        }
+        .category-card .btn-outline-primary {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <!-- Logo Image -->
+            <img src="/users/images/logo2.png" alt="Kenza Store Logo" class="navbar-brand-logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <form class="form-inline ml-5">
+                <input class="form-control mr-sm-2 border" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-light my-2 my-sm-0" type="submit">Search</button>
+            </form>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Shop</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Wishlist</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Cart</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact Us</a>
+                </li>
+            </ul>
+            <a href="/logout" class="btn btn-info ml-2">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Cover Image Section -->
+    <div class="cover-card">
+        <div class="cover-overlay text-center">
+            <h1 class="fw-bold">DQ Mall</h1>
+            <p class="fs-4">Explore the fashion through our latest collections.</p>
+            <a href="#" class="btn btn-lg btn-outline-light">Shop Now</a>
+        </div>
+    </div>
+    <br>
+
+    <!-- Product Categories Section -->
+    <div class="container">
+        <h2 class="text-center mb-4">Shop by Category</h2>
+        <div class="row text-center">
+            <% categories.forEach(category => { %>
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm border-0 category-card">
+                        <% if (category.imageUrl) { %>
+                            <img src="<%= category.imageUrl %>" class="card-img-top" alt="<%= category.name %>">
+                        <% } else { %>
+                            <img src="/path/to/default-image.jpg" class="card-img-top" alt="<%= category.name %>">
+                        <% } %>
+                        <div class="card-body">
+                            <h5 class="card-title"><%= category.name %></h5>
+                            <a href="/category/<%= category._id %>/products" class="btn btn-outline-primary">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+
+    <!-- Featured Products Section
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Featured Products</h2>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm border-0">
+                    <img src="/users/images/prd3.2.jpg" class="card-img-top" alt="Product 1">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Product 1</h5>
+                        <p class="card-text">$19.99</p>
+                        <a href="#" class="btn btn-primary btn-block">Add to Cart</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm border-0">
+                    <img src="/users/images/prd1.2.jpg" class="card-img-top" alt="Product 2">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Product 2</h5>
+                        <p class="card-text">$29.99</p>
+                        <a href="#" class="btn btn-primary btn-block">Add to Cart</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm border-0">
+                    <img src="/users/images/prd2.2.jpg" class="card-img-top" alt="Product 3">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Product 3</h5>
+                        <p class="card-text">$39.99</p>
+                        <a href="#" class="btn btn-primary btn-block">Add to Cart</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm border-0">
+                    <img src="https://via.placeholder.com/300x300" class="card-img-top" alt="Product 4">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Product 4</h5>
+                        <p class="card-text">$49.99</p>
+                        <a href="#" class="btn btn-primary btn-block">Add to Cart</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
