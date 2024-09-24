@@ -1,0 +1,56 @@
+<%- include("./profilePartial.ejs") %>
+
+    
+<div class="card-body">
+    <div id="change-password" class="account-section">
+        <h3 class="mb-4">Change Password</h3>
+        <% if (message) { %>
+            <div class="alert alert-danger" role="alert">
+                <%= message %>
+            </div>
+        <% } %>
+        <div class="card">
+            <div class="card-body">
+                <form id="changePasswordForm" action="/profile/change-password" method="post">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" name="oldPassword" id="currentPassword" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" class="form-control" name="newPassword" id="newPassword" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- JavaScript for form validation -->
+<script>
+    document.getElementById('changePasswordForm').addEventListener('submit', function(event) {
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (newPassword !== confirmPassword) {
+            event.preventDefault();
+            // Display a user-friendly message and highlight the fields
+            alert('New Password and Confirm New Password do not match!');
+            document.getElementById('newPassword').classList.add('is-invalid');
+            document.getElementById('confirmPassword').classList.add('is-invalid');
+        } else {
+            // Remove any error highlights if passwords match
+            document.getElementById('newPassword').classList.remove('is-invalid');
+            document.getElementById('confirmPassword').classList.remove('is-invalid');
+        }
+    });
+</script>
+
+
+<%- include("./profileFooter.ejs") %>

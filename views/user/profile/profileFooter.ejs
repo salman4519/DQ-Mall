@@ -1,0 +1,24 @@
+</div>
+</div>
+</div>
+</div>
+
+<script>
+// Get the current URL path
+const currentPath = window.location.pathname;
+
+// Select all navigation links
+const navLinks = document.querySelectorAll('.nav-link');
+
+// Loop through the links to find the active one
+navLinks.forEach(link => {
+// Check if the link's href matches the current path
+if (link.getAttribute('href') === currentPath) {
+    link.classList.add('active'); // Add 'active' class if it matches
+}
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

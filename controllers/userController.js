@@ -4,6 +4,7 @@ const Category = require("../models/categoryModel")
 const otpGenerator = require('otp-generator');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
+const addressModel = require("../models/addressModel");
 require('dotenv').config();
 
 
@@ -118,7 +119,7 @@ const getSigup = async (req, res) => {
 
 //to post signup
 const postSignup = async (req, res) => {
-    const { Email, Username, Mobile } = req.body;
+    const { Email, Username, Mobile ,Password } = req.body;
     console.log(`Received data - Email: ${Email}, Username: ${Username}, Mobile: ${Mobile}`);
 
     if (!Email || !Username) {
@@ -136,11 +137,13 @@ const postSignup = async (req, res) => {
         const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit numeric OTP
         const otpExpiresAt = Date.now() + 15 * 60 * 1000; // OTP expires in 15 minutes
 
+        const pass = await bcrypt.hash(Password, 10);
         // Create new user
         user = new User({
             Email,
             Username,
             Mobile,
+            Password,
             OTP: otp,
             otpExpiresAt
         });
@@ -257,8 +260,220 @@ const logout = (req, res) => {
         console.log("logout is broke")
 
     }
-
 };
+
+//to get profile page
+
+
+const getProfile = async (req, res) => {
+    try {
+        // // Check if userId is defined in the session
+        // if (!req.session.userId) {
+        //     return res.status(400).json({ message: "User not found or not authenticated." });
+        // }
+
+        // // Proceed with fetching the profile using the user's ID
+         const userId = req.session.userId;
+
+        // // Fetch user details based on the ID
+         const user = await User.findById(userId);
+
+        // if (!user) {
+        //     return res.status(404).json({ message: "User not found." });
+        // }
+
+        // Render the user profile view and pass user data
+        res.render('user/profile/userProfile', { user});
+    } catch (error) {
+        console.error("Unexpected error while fetching profile:", error);
+        res.status(500).json({ message: "Server error while fetching profile." });
+    }
+};
+
+
+
+// Edit profile
+const editProfile = async (req, res) => {
+    const { Username, Mobile } = req.body;
+    try {
+        await User.findByIdAndUpdate(req.session.userId, { Username, Mobile, UpdatedAt: new Date() });
+        res.redirect('/profile');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+};
+
+
+
+// Cancel order
+const cancelOrder = async (req, res) => {
+    try {
+        await Order.findByIdAndUpdate(req.params.orderId, { status: 'Cancelled' });
+        res.redirect('/profile/orders');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+};
+
+// Change password
+const changePassword = async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+
+    // Get the authenticated user's ID from the session
+    const userId = req.session.userId;
+    console.log(userId)
+
+
+    try {
+        // Fetch the user from the database
+        const user = await User.findOne({ _id: userId });
+        console.log(user.Password)
+        console.log(user.Mobile)
+        console.log(oldPassword)
+
+
+        // Check if the user and password are defined
+        if (!user || !user.Password) {
+            console.log("User or user.Password not found.");
+            return res.render('user/profile/userChangePass',{ message: 'User not found or password not set.' });
+        }
+
+        // Compare the provided old password with the stored hashed password
+        const isMatch = await bcrypt.compare(oldPassword, user.Password);
+        if (!isMatch) {
+            return res.render('user/profile/userChangePass',{ message: 'Current password is incorrect' });
+        }
+
+        // Hash the new password before saving
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update the password in the database
+        user.Password = hashedNewPassword;
+        await user.save();
+
+        // Redirect back to profile on success
+        res.redirect('/profile');
+    } catch (err) {
+        console.log("Error in changePassword:", err);
+        res.render('user/profile/userChangePass',{ message: 'Server error' });
+    }
+};
+
+// Add or edit address
+const addAddress = async (req, res) => {
+    const { FullName, MobileNo, FlatNo, Address, Landmark, Pincode, City, District, State, Country, AddressType } = req.body;
+    const userId = req.session.userId; // Assuming user is authenticated and user ID is available in req.user
+
+    const newAddress = new addressModel({
+        UserId: userId,
+        FullName,
+        MobileNo,
+        FlatNo,
+        Address,
+        Landmark,
+        Pincode,
+        City,
+        District,
+        State,
+        Country,
+        AddressType
+    });
+
+    try {
+        await newAddress.save();
+        res.redirect('/profile/address'); // Redirect after adding
+    } catch (error) {
+        console.error('Error adding address:', error);
+        res.status(500).send('Error adding address');
+    }
+};
+
+//to edit the address
+const editAddress = async (req, res) => {
+    const { id } = req.params;
+    const { FullName, MobileNo, FlatNo, Address, Landmark, Pincode, City, District, State, Country, AddressType } = req.body;
+
+    try {
+        await addressModel.findByIdAndUpdate(id, {
+            FullName,
+            MobileNo,
+            FlatNo,
+            Address,
+            Landmark,
+            Pincode,
+            City,
+            District,
+            State,
+            Country,
+            AddressType
+        }, { new: true });
+        res.redirect('/profile/address'); // Redirect to profile page or wherever you need
+    } catch (error) {
+        console.error('Error editing address:', error);
+        res.status(500).send('Error editing address');
+    }
+};
+
+//to delete address
+const deleteAddress = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await addressModel.findByIdAndDelete(id);
+        res.redirect('/profile/address'); // Redirect to profile page or wherever you need
+    } catch (error) {
+        console.error('Error deleting address:', error);
+        res.status(500).send('Error deleting address');
+    }
+};
+
+//to get userAdresses in profile
+const getUserAdresses = async(req,res)=>{
+        const userId = req.session.userId;
+        const addresses = await addressModel.find({UserId:userId});
+    try {
+        res.render('user/profile/userAddresses',{ addresses})
+    } catch (error) {
+        console.log("get user Addresses broke")
+    }
+}
+
+//to get userOrder in profile page
+const getUserOrders = async(req,res)=>{
+
+    try {
+        res.render('user/profile/userOrder')
+    } catch (error) {
+        console.log("get user order broke")
+    }
+}
+
+//to get user cahnge password in profile page
+const getUserPass = async(req,res)=>{
+
+    try {
+        res.render('user/profile/userChangePass',{ message: ''})
+    } catch (error) {
+        console.log("get user change pass broke")
+    }
+}
+
+//to get profile edit
+const getProfileEdit = async(req,res)=>{
+        // // Proceed with fetching the profile using the user's ID
+        const userId = req.session.userId;
+
+        // // Fetch user details based on the ID
+         const user = await User.findById(userId);
+    try {
+        res.render("user/profile/profileEdit",{ user , message:'' })
+    } catch (error) {
+        console.log("the get profile is broke")
+        
+    }
+}
 
 
 module.exports = {
@@ -271,5 +486,17 @@ module.exports = {
     verifyOtp,
     postLogin,
     getVerifyOtp,
-    logout
+    logout,
+    getProfile,
+    editProfile,
+    getUserOrders,
+    cancelOrder,
+    changePassword,
+    addAddress,
+    editAddress,
+    deleteAddress,
+    getUserAdresses,
+    getUserPass,
+    getProfileEdit
+
 }

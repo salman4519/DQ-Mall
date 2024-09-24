@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     Mobile: { type: String, required: false },
     UpdatedAt: { type: Date, required: true, default: new Date() },
     CreatedAt: { type: Date, required: true, default: new Date() },
-    Password: { type: String, required: false }, // Optional for Google login
+    Password: { type: String, required: true }, // Optional for Google login
     GoogleId: { type: String }, // Add this for Google OAuth
     Is_admin: { type: Boolean, required: true, default: false },
     Is_block: { type: Boolean, required: true, default: false },

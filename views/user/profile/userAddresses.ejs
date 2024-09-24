@@ -1,0 +1,207 @@
+<%- include("./profilePartial.ejs") %>
+
+<div class="container mt-4">
+    <!-- Add Address Button -->
+    <div class="text-end mb-3">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">Add Address</button>
+    </div>
+
+    <!-- Addresses Section -->
+    <% if (addresses && addresses.length > 0) { %>
+        <div class="row">
+            <% addresses.forEach((address, index) => { %>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title"><%= address.FullName %></h5>
+                            <p class="card-text">
+                                <strong>Mobile:</strong> <%= address.MobileNo %><br>
+                                <strong>Address:</strong> <%= address.FlatNo %>, <%= address.Address %>, <%= address.Landmark %>, <%= address.City %>, <%= address.District %>, <%= address.State %>, <%= address.Country %>, <%= address.Pincode %><br>
+                                <strong>Address Type:</strong> <%= address.AddressType %>
+                            </p>
+                            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#editAddressModal<%= index %>">Edit</button>
+                            <form action="/profile/address/delete/<%= address._id %>" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Address Modal -->
+                <div class="modal fade" id="editAddressModal<%= index %>" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editAddressModalLabel">Edit Address</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="/profile/address/edit/<%= address._id %>" method="POST">
+                                    <div class="mb-3">
+                                        <label for="FullName<%= index %>" class="form-label">Full Name</label>
+                                        <input type="text" class="form-control" id="FullName<%= index %>" name="FullName" value="<%= address.FullName %>" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="MobileNo<%= index %>" class="form-label">Mobile</label>
+                                        <input type="text" class="form-control" id="MobileNo<%= index %>" name="MobileNo" value="<%= address.MobileNo %>" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="FlatNo<%= index %>" class="form-label">Flat No.</label>
+                                        <input type="text" class="form-control" id="FlatNo<%= index %>" name="FlatNo" value="<%= address.FlatNo %>">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="Address<%= index %>" class="form-label">Address</label>
+                                        <input type="text" class="form-control" id="Address<%= index %>" name="Address" value="<%= address.Address %>" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="Landmark<%= index %>" class="form-label">Landmark</label>
+                                        <input type="text" class="form-control" id="Landmark<%= index %>" name="Landmark" value="<%= address.Landmark %>">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="Pincode<%= index %>" class="form-label">Pincode</label>
+                                        <input type="number" class="form-control" id="Pincode<%= index %>" name="Pincode" value="<%= address.Pincode %>" required onblur="fetchAddressData(<%= index %>, this.value)">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="City<%= index %>" class="form-label">City</label>
+                                        <input type="text" class="form-control" id="City<%= index %>" name="City" value="<%= address.City %>" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="District<%= index %>" class="form-label">District</label>
+                                        <input type="text" class="form-control" id="District<%= index %>" name="District" value="<%= address.District %>" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="State<%= index %>" class="form-label">State</label>
+                                        <input type="text" class="form-control" id="State<%= index %>" name="State" value="<%= address.State %>" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="Country<%= index %>" class="form-label">Country</label>
+                                        <input type="text" class="form-control" id="Country<%= index %>" name="Country" value="<%= address.Country %>" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="AddressType<%= index %>" class="form-label">Address Type</label>
+                                        <select class="form-select" id="AddressType<%= index %>" name="AddressType">
+                                            <option value="Home" <%= address.AddressType === 'Home' ? 'selected' : '' %>>Home</option>
+                                            <option value="Work" <%= address.AddressType === 'Work' ? 'selected' : '' %>>Work</option>
+                                            <option value="Others" <%= address.AddressType === 'Others' ? 'selected' : '' %>>Others</option>
+                                        </select>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    <% } else { %>
+        <p>No addresses added yet.</p>
+    <% } %>
+
+    <!-- Add Address Modal -->
+    <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/profile/address/add" method="POST">
+                        <div class="mb-3">
+                            <label for="FullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="FullName" name="FullName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="MobileNo" class="form-label">Mobile</label>
+                            <input type="text" class="form-control" id="MobileNo" name="MobileNo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="FlatNo" class="form-label">Flat No.</label>
+                            <input type="text" class="form-control" id="FlatNo" name="FlatNo">
+                        </div>
+                        <div class="mb-3">
+                            <label for="Address" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="Address" name="Address" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="Landmark" class="form-label">Landmark</label>
+                            <input type="text" class="form-control" id="Landmark" name="Landmark">
+                        </div>
+                        <div class="mb-3">
+                            <label for="Pincode" class="form-label">Pincode</label>
+                            <input type="number" class="form-control" id="Pincode" name="Pincode" required onblur="fetchAddressData('new', this.value)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="City" class="form-label">City</label>
+                            <input type="text" class="form-control" id="City" name="City" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="District" class="form-label">District</label>
+                            <input type="text" class="form-control" id="District" name="District" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="State" class="form-label">State</label>
+                            <input type="text" class="form-control" id="State" name="State" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="Country" class="form-label">Country</label>
+                            <input type="text" class="form-control" id="Country" name="Country" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="AddressType" class="form-label">Address Type</label>
+                            <select class="form-select" id="AddressType" name="AddressType" required>
+                                <option value="Home">Home</option>
+                                <option value="Work">Work</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Add Address</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to fetch address data from Indian postal code API
+        function fetchAddressData(mode, pincode) {
+            fetch(`https://api.postalpincode.in/pincode/${pincode}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Address not found');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data[0].Status === "Success") {
+                        if (mode === 'new') {
+                            document.getElementById('City').value = data[0].PostOffice[0].District; // Fetching District from API
+                            document.getElementById('District').value = data[0].PostOffice[0].District;
+                            document.getElementById('State').value = data[0].PostOffice[0].State; // Fetching State from API
+                            document.getElementById('Country').value = "India"; // Hardcoded as India
+                        } else {
+                            const index = parseInt(mode);
+                            document.getElementById(`City${index}`).value = data[0].PostOffice[0].District;
+                            document.getElementById(`District${index}`).value = data[0].PostOffice[0].District;
+                            document.getElementById(`State${index}`).value = data[0].PostOffice[0].State;
+                            document.getElementById(`Country${index}`).value = "India"; // Hardcoded as India
+                        }
+                    } else {
+                        alert('Could not fetch address data. Please check the postal code and try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching address:', error);
+                    alert('Could not fetch address data. Please check the postal code and try again.');
+                });
+        }
+    </script>
+</div>
+
+<%- include("./profileFooter.ejs") %>

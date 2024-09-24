@@ -9,8 +9,8 @@ const userController = require("../controllers/userController")
 const UserModel = require("../models/userModel")
 
 // Import middleware Auth
-const userAuth = require('../middleware/userAuth');
-const userAuthed = require('../middleware/userAuthenticated')
+const userAuth = require('../middleware/user/userAuth');
+const userAuthed = require('../middleware/user/userAuthenticated')
 
 //route for google authentication
 userRoute.get('/auth/google', passport.authenticate('google', {
@@ -37,8 +37,8 @@ userRoute.get('/auth/google/callback',
 );
 
 //route for login page
-userRoute.get('/',userAuthed,userController.getLogin)
-userRoute.post('/',userController.postLogin)
+userRoute.get('/login',userAuthed,userController.getLogin)
+userRoute.post('/login',userController.postLogin)
 
 //route for verify otp page
 userRoute.get('/verify-otp',userAuthed,userController.getVerifyOtp)
@@ -58,6 +58,38 @@ userRoute.get('/category/:id/products',userAuth, userController.loadCategoryProd
 
 // Route to load product details page
 userRoute.get('/product/:id',userAuth, userController.loadProductDetails);
+
+// Get user profile
+userRoute.get('/profile',userAuth, userController.getProfile);
+
+// Edit user profile
+userRoute.post('/profile/edit',userAuth, userController.editProfile);
+userRoute.get('/profile/edit',userAuth, userController.getProfileEdit);
+
+
+// View user orders
+userRoute.get('/profile/orders',userAuth, userController.getUserOrders);
+
+// Cancel order
+userRoute.post('/profile/orders/:orderId/cancel', userController.cancelOrder);
+
+
+
+// Add or edit address
+userRoute.post('/profile/address/edit/:id', userController.editAddress);
+userRoute.post('/profile/address/add', userController.addAddress);
+userRoute.get('/profile/address',userAuth, userController.getUserAdresses);
+
+//to delete address
+userRoute.post('/profile/address/delete/:id', userController.deleteAddress);
+
+
+
+// Change password
+userRoute.post('/profile/change-password', userController.changePassword);
+userRoute.get('/profile/change-password',userAuth, userController.getUserPass);
+
+
 
 //route to logout
 userRoute.get('/logout',userAuth,userController.logout)

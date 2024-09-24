@@ -1,0 +1,37 @@
+<%- include("./profilePartial.ejs") %>
+
+<div id="personal-details" class="account-section active">
+    <h3 class="mb-4"> Edit Personal Information</h3>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="row">
+                
+                  <!-- Modal for editing personal details -->
+            <div class="modal-body">
+                <form id="editPersonalDetailsForm" action="/profile/edit" method="post">
+                    <div class="col-md-6 mb-3">
+                        <label for="editUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="editUsername" name="Username" value="<%= user.Username %>" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="editMobile" class="form-label">Mobile</label>
+                        <input type="text" class="form-control" id="editMobile" name="Mobile" value="<%= user.Mobile %>" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="editEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail" name="Email" value="<%= user.Email %>" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+        </div>
+    </div>
+
+
+
+
+<%- include("./profileFooter.ejs") %>

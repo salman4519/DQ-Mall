@@ -1,0 +1,56 @@
+<%- include("./profilePartial.ejs") %>
+
+<div id="personal-details" class="account-section active">
+    <h3 class="mb-4">Personal Information</h3>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Username</label>
+                    <input type="text" class="form-control border-0 bg-light" value="<%= user.Username %>" readonly />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Mobile</label>
+                    <input type="text" class="form-control border-0 bg-light" value="<%= user.Mobile %>" readonly />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Email</label>
+                    <input type="email" class="form-control border-0 bg-light" value="<%= user.Email %>" readonly />
+                </div>
+            </div>
+            <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#editPersonalDetailsModal">Edit Details</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for editing personal details -->
+<div class="modal fade" id="editPersonalDetailsModal" tabindex="-1" aria-labelledby="editPersonalDetailsLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPersonalDetailsLabel">Edit Personal Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPersonalDetailsForm" action="/profile/edit" method="post">
+                    <div class="mb-3">
+                        <label for="editUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="editUsername" name="Username" value="<%= user.Username %>" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editMobile" class="form-label">Mobile</label>
+                        <input type="text" class="form-control" id="editMobile" name="Mobile" value="<%= user.Mobile %>" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail" name="Email" value="<%= user.Email %>" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<%- include("./profileFooter.ejs") %>

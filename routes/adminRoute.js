@@ -6,8 +6,8 @@ const adminRoute = express();
 const adminController = require("../controllers/adminController")
 
 //import middleware Auth
-const adminAuth = require("../middleware/adminAuth")
-const adminAuthed = require("../middleware/adminAuthenticated")
+const adminAuth = require("../middleware/admin/adminAuth")
+const adminAuthed = require("../middleware/admin/adminAuthenticated")
 
 //route for admin login page
 adminRoute.get('/',adminAuthed,adminController.loadLogin)
