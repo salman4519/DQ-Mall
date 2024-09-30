@@ -50,6 +50,9 @@ userRoute.get('/signup',userAuthed,userController.getSigup)
 userRoute.post('/signup',userController.postSignup)
 userRoute.post('/verify-otp', userController.verifyOtp);
 
+//route for land page
+userRoute.get('/',userAuthed,userController.getLandPage)
+
 //route for home page
 userRoute.get('/home',userAuth,userController.loadHome)
 
@@ -71,7 +74,7 @@ userRoute.get('/profile/edit',userAuth, userController.getProfileEdit);
 userRoute.get('/profile/orders',userAuth, userController.getUserOrders);
 
 // Cancel order
-userRoute.post('/profile/orders/:orderId/cancel', userController.cancelOrder);
+userRoute.post('/cancel-order', userController.cancelOrder);
 
 
 
@@ -93,6 +96,33 @@ userRoute.get('/profile/change-password',userAuth, userController.getUserPass);
 
 //route to logout
 userRoute.get('/logout',userAuth,userController.logout)
+
+//route for cart
+userRoute.get('/cart',userAuth,userController.getCart)
+userRoute.post('/cart/update',userAuth,userController.updateCart)
+userRoute.post('/cart/remove',userAuth,userController.removeCart)
+userRoute.post('/cart/add',userAuth,userController.addCart)
+
+//route for chekout page
+userRoute.get('/checkout',userAuth,userController.getCheckout)
+userRoute.post('/checkout',userAuth,userController.postCheckout)
+userRoute.post('/checkout/address/edit/:id', userController.editAddressCheck);
+userRoute.post('/checkout/address/add', userController.addAddressCheck);
+userRoute.post('/checkout/address/delete/:id', userController.deleteAddressCheck);
+userRoute.post('/order',userController.postOrder)
+
+userRoute.delete('/cart/:productId', userController.deleteCartItem);
+userRoute.get('/success',userAuth,userController.getSuccess)
+
+//route for shop 
+userRoute.get('/shop',userAuth,userController.getShop)
+userRoute.get('/load-items',userAuth,userController.loadShopItems)
+userRoute.get('/load-categories',userAuth, userController.shopCategoryItems);
+
+
+
+
+
 
 //export
 module.exports = userRoute;

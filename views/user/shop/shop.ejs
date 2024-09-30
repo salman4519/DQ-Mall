@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+            border-radius: 15px;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .filter-section h5 {
+            margin-bottom: 20px;
+        }
+
+        .card img {
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            height: 250px; /* Adjust height as needed */
+            object-fit: cover; /* Ensure images cover the card */
+        }
+
+        .card-title {
+            text-transform: capitalize;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .breadcrumb {
+            background-color: #7b838b;
+            border-radius: 5px;
+            padding: 10px 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .breadcrumb-item a {
+            color: #007bff;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        .breadcrumb-item a:hover {
+            text-decoration: underline;
+        }
+
+        .navbar-nav .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .navbar-nav .nav-link i {
+            font-size: 1.5rem; /* Adjust this size */
+        }
+
+        .navbar-nav .nav-item {
+            margin-right: 15px; /* Adjust this value for more or less space */
+        }
+
+        .navbar-brand-logo {
+            height: 70px;
+            margin-right: 50px;
+            margin-left: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="/users/images/logo2.png" alt="Kenza Store Logo" class="navbar-brand-logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/home"><i class="bi bi-house"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="bi bi-shop"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="bi bi-bag-heart"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/cart"><i class="bi bi-cart-dash"></i></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="bi bi-person-circle"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                        <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Breadcrumbs -->
+    <div aria-label="breadcrumb">
+        <ol class="breadcrumb bg-light">
+            <li class="breadcrumb-item"><a href="/home">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Shop</li>
+        </ol>
+    </div>
+
+    <div class="container">
+        <h1 class="my-4 text-center">Shop</h1>
+
+        <div class="row">
+            <!-- Filters Section -->
+            <div class="col-md-3">
+                <div class="filter-section">
+                    <h5>Filters</h5>
+                    <div class="form-group">
+                        <label for="categoryFilter">Category:</label>
+                        <select id="categoryFilter" class="form-control">
+                            <option value="">All Categories</option>
+                            <!-- Categories will be populated here -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="priceFilter">Price:</label>
+                        <select id="priceFilter" class="form-control">
+                            <option value="">Select</option>
+                            <option value="lowToHigh">Low to High</option>
+                            <option value="highToLow">High to Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="newArrivalFilter">New Arrivals:</label>
+                        <select id="newArrivalFilter" class="form-control">
+                            <option value="">Select</option>
+                            <option value="newest">Newest</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="nameFilter">Sort by Name:</label>
+                        <select id="nameFilter" class="form-control">
+                            <option value="">Select</option>
+                            <option value="aToZ">A - Z</option>
+                            <option value="zToA">Z - A</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Grid Section -->
+            <div class="col-md-9">
+                <div class="form-group mb-4">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by product name">
+                </div>
+                <div id="productGrid" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                    <!-- Product items will be dynamically populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const productGrid = document.getElementById("productGrid");
+            const categoryFilter = document.getElementById("categoryFilter");
+            const priceFilter = document.getElementById("priceFilter");
+            const newArrivalFilter = document.getElementById("newArrivalFilter");
+            const nameFilter = document.getElementById("nameFilter");
+            const searchInput = document.getElementById("searchInput");
+    
+            // Fetch categories from the server and populate the category filter
+            function fetchCategories() {
+                fetch('/load-categories') // Your API endpoint for categories
+                    .then(response => response.json())
+                    .then(categories => {
+                        categories.forEach(category => {
+                            const option = document.createElement('option');
+                            option.value = category._id; // Assuming category has an _id
+                            option.textContent = category.name; // Assuming category has a name
+                            categoryFilter.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching categories:', error));
+            }
+    
+            // Fetch products from the server
+            function fetchProducts(queryParams = {}) {
+                let queryString = new URLSearchParams(queryParams).toString();
+    
+                fetch(`/load-items?${queryString}`) // Your API endpoint with dynamic query string
+                    .then(response => response.json())
+                    .then(products => {
+                        displayProducts(products);
+                    })
+                    .catch(error => console.error('Error fetching products:', error));
+            }
+    
+            // Display products in the grid
+            function displayProducts(products) {
+                productGrid.innerHTML = ''; // Clear existing products
+    
+                if (products.length > 0) {
+                    products.forEach(product => {
+                        const productCol = document.createElement('div');
+                        productCol.className = 'col-sm-6 col-md-4 col-lg-3 mb-4'; // Adjust based on number of products in a row
+    
+                        productCol.innerHTML = `
+                            <div class="card shadow-sm border-0">
+                                <img src="/uploads/${product.Images[0]}" class="card-img-top" alt="${product.Name}">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">${product.Name}</h5>
+                                    <p class="card-text">$${product.Price.toFixed(2)}</p>
+                                    <a href="/product/${product._id}" class="btn btn-primary btn-block">Quick view</a>
+                                </div>
+                            </div>
+                        `;
+                        productGrid.appendChild(productCol);
+                    });
+                } else {
+                    productGrid.innerHTML = `<p class="text-center">No products found.</p>`;
+                }
+            }
+    
+            // Combine all filters into a single object and fetch products
+            function getFilters() {
+                return {
+                    categoryId: categoryFilter.value,
+                    priceOrder: priceFilter.value,
+                    arrivalOrder: newArrivalFilter.value,
+                    nameOrder: nameFilter.value,
+                    searchTerm: searchInput.value.toLowerCase(),
+                    // No need to include isList here since it's handled in the backend
+                };
+            }
+    
+            // Fetch all products on page load
+            fetchProducts(); // This will fetch all products initially
+            fetchCategories(); // Fetch categories to populate the dropdown
+    
+            // Filter functionality
+            const updateProductDisplay = () => fetchProducts(getFilters());
+    
+            // Attach event listeners for filters
+            categoryFilter.addEventListener("change", updateProductDisplay);
+            priceFilter.addEventListener("change", updateProductDisplay);
+            newArrivalFilter.addEventListener("change", updateProductDisplay);
+            nameFilter.addEventListener("change", updateProductDisplay);
+            searchInput.addEventListener("input", updateProductDisplay);
+        });
+    </script>
+</body>
+
+</html>

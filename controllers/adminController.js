@@ -2,6 +2,7 @@
 const model = require("../models/userModel")
 const Product = require("../models/productModel")
 const Category = require("../models/categoryModel")
+const Order = require("../models/orderModel")
 const bcrypt = require("bcrypt")
 const path = require('path')
 const fs = require('fs')
@@ -93,8 +94,8 @@ const verifyLogin = async (req, res) => {
 const loadDash = async (req,res)=>{
 
     try {
-        
-        res.render('admin/demo')
+        const categories = await Category.find();
+        res.render('admin/demo',{ categories })
     } catch (error){
         console.log("dash post broke")
         
@@ -351,7 +352,7 @@ const loadCategory = async (req, res) => {
 const addCategory = async(req,res)=>{
 
     try {
-        res.render('admin/addCategory')
+        res.render('admin/addCategory',{message:""})
         
     } catch (error) {
         console.log("add Category broke")
@@ -366,7 +367,7 @@ const insertCategory = async (req, res) => {
         const image = req.file ? `/uploads/${req.file.filename}` : null;
 
         if (!name) {
-            return res.status(400).json({ message: "Category name is required." });
+            return res.render('admin/addCategory',{ message: "Category name is required." });
         }
 
         // Create a new category
@@ -383,7 +384,7 @@ const insertCategory = async (req, res) => {
         res.redirect('/admin/category'); // Redirect to category list or success page
     } catch (error) {
         console.error('Error adding category:', error);
-        res.status(500).json({ message: "Error adding category", error });
+        res.render('admin/addCategory',{ message: "Error adding category", error });
     }
 };
 
@@ -391,7 +392,8 @@ const insertCategory = async (req, res) => {
 const loadEditCategory = async (req, res) => {
     try {
       const category = await Category.findById(req.params.id);
-      res.render('admin/editCategory', { category });
+      const message = ""
+      res.render('admin/editCategory', {category });
     } catch (error) {
       console.error(error);
       res.status(500).send('Server Error');
@@ -413,7 +415,7 @@ const loadEditCategory = async (req, res) => {
         const category = await Category.findById(id);
 
         if (!category) {
-            return res.status(404).json({ message: "Category not found." });
+            res.render('admin/editCategory',{ message: "Category not found." ,category });
         }
 
         // Update category fields
@@ -428,9 +430,10 @@ const loadEditCategory = async (req, res) => {
         res.redirect('/admin/category'); // Redirect to category list or success page
     } catch (error) {
         console.error('Error updating category:', error);
-        res.status(500).json({ message: "Error updating category", error });
+        res.render('admin/editCategory',{ message: "Error updating category", error });
     }
 };
+
   // to delete category 
   const deleteCategory = async (req, res) => {
     try {
@@ -485,6 +488,162 @@ const logout = (req, res) => {
     });
 };
 
+//to get orders 
+const getOrders = async(req,res)=>{
+    const page = parseInt(req.query.page) || 1; // Default to page 1
+    const limit = 5; // Number of categories per page
+    const skip = (page - 1) * limit; // Calculate how many categories to skip
+
+        const orders = await Order.find({}).skip(skip).limit(limit)
+        const totalOrders = await Order.countDocuments(); 
+
+    try {
+        res.render("admin/orders",{ 
+            orders ,
+            currentPage: page,
+            totalPages: Math.ceil(totalOrders / limit)
+          });
+    } catch (error) {
+        
+    }
+}
+
+const orderDetails = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        console.log('Fetching order details for OrderId:', orderId);
+        const order = await Order.findOne({ OrderId: orderId })
+            .populate('Products.ProductId')  // Assuming ProductId is a reference to a Product model
+            .populate('ShippingAddress');      // Assuming ShippingAddress is a reference to an Address model
+
+        if (!order) {
+            console.log('Order not found for OrderId:', orderId);
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Format the order details to include product and address details
+        const orderDetails = {
+            PaymentMethod:order.PaymentMethod,
+            OrderId: order.OrderId,
+            TotalPrice: order.TotalPrice,
+            Status: order.Status,
+            Products: order.Products.map(item => ({
+                ProductId: item.ProductId._id,
+                Name: item.ProductId.Name,
+                Price: item.ProductId.Price,
+                Image: item.ProductId.Images[0],
+                Quantity: item.Quantity,
+            })),
+            ShippingAddress: {
+                FullName: order.ShippingAddress.FullName,
+                Street: order.ShippingAddress.Address,
+                City: order.ShippingAddress.City,
+                Pincode: order.ShippingAddress.Pincode,
+                Country: order.ShippingAddress.Country,
+                AddressType: order.ShippingAddress.AddressType,
+            }
+        };
+
+        console.log(orderDetails);
+        res.json(orderDetails);
+    } catch (error) {
+        console.error('Error fetching order details:', error);
+        res.status(500).json({ message: 'Failed to load order details' });
+    }
+};
+
+const fetchOrderDetails = async (orderId) => {
+    try {
+        const response = await fetch(`/order-details/${orderId}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const orderData = await response.json();
+        // Handle order data (e.g., display it in your UI)
+    } catch (error) {
+        console.error('Error fetching order details:', error);
+        // Display error message to user
+    }
+};
+
+const cancelOrder = async (req, res) => {
+    const { orderId } = req.body;
+  
+    try {
+      // Find the order by ID
+      const order = await Order.findOne({ OrderId: orderId });
+      if (!order) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+  
+      // Check if the status can be updated
+      if (order.Status === 'Cancelled' || order.Status === 'Delivered') {
+        return res.status(400).json({ message: 'Cannot cancel this order' });
+      }
+  
+      // Update the order status to 'Cancelled'
+      order.Status = 'Cancelled';
+      await order.save();
+  
+      res.status(200).json({ message: 'Order status updated successfully', order });
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+
+  const updateOrderStatus = async (req, res) => {
+    const { orderId, newStatus } = req.body;
+  
+    try {
+      // Find the order by ID
+      const order = await Order.findOne({ OrderId: orderId });
+      if (!order) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+  
+      // Check if the status can be updated
+      if (order.Status === 'Delivered' || order.Status === 'Cancelled') {
+        return res.status(400).json({ message: 'Cannot update this order' });
+      }
+  
+      // Update the order status
+      order.Status = newStatus;
+      await order.save();
+  
+      res.status(200).json({ message: 'Order status updated successfully', order });
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
+  // Controller function to cancel an order
+  exports.cancelOrder = async (req, res) => {
+    const { orderId } = req.body;
+  
+    try {
+      // Find the order by ID
+      const order = await Order.findOne({ OrderId: orderId });
+      if (!order) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+  
+      // Check if the status can be updated
+      if (order.Status === 'Cancelled' || order.Status === 'Delivered') {
+        return res.status(400).json({ message: 'Cannot cancel this order' });
+      }
+  
+      // Update the order status to 'Cancelled'
+      order.Status = 'Cancelled';
+      await order.save();
+  
+      res.status(200).json({ message: 'Order status updated successfully', order });
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
 
 
 //export
@@ -512,7 +671,11 @@ module.exports = {
     blockUser,
     unblockUser,
     upload,
-    logout
+    logout,
+    getOrders,
+    orderDetails,
+    cancelOrder,
+    updateOrderStatus
     
 
 }

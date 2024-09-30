@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kenza Store</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        .cover-card {
+            position: relative;
+            height: 600px;
+            background: url('/users/images/cover3.jpg') center/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cover-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #fff;
+        }
+        .navbar-brand-logo {
+            height: 70px;
+            margin-right: 50px;
+            margin-left: 30px;
+        }
+        .category-card {
+            width: 100%; /* Ensure the card takes full width within its column */
+            height: 600px; /* Fixed height for the category card */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid #ddd; /* Optional: Add border for better visibility */
+        }
+        .category-card img {
+            height: 450px; /* Fixed height for the image */
+            object-fit: cover; /* Ensure the image covers the container */
+        }
+        .category-card .card-body {
+            padding: 15px;
+            text-align: center;
+        }
+        .category-card .btn-outline-primary {
+            margin-top: 10px;
+        }
+        .navbar-nav .nav-link i {
+        font-size: 1.5rem; /* You can adjust this size */
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <!-- Logo Image -->
+            <img src="/users/images/logo2.png" alt="Kenza Store Logo" class="navbar-brand-logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <form class="form-inline ml-5">
+                <input class="form-control mr-sm-2 border" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-light my-2 my-sm-0" type="submit">Search</button>
+            </form>
+            <ul class="navbar-nav ml-auto">
+                 
+            </ul>
+            <a href="/login" class="btn btn-dark ml-2"><i class="bi bi-box-arrow-in-right"></i></a>
+        </div>
+    </nav>
+
+    <!-- Cover Image Section -->
+    <div class="cover-card">
+        <div class="cover-overlay text-center">
+            <h1 class="fw-bold">DQ Mall</h1>
+            <p class="fs-4">Explore the fashion through our latest collections.</p>
+            <a href="#" class="btn btn-lg btn-outline-light">Shop Now</a>
+        </div>
+    </div>
+    <br>
+
+    <!-- Product Categories Section -->
+    <div class="container">
+        <h2 class="text-center mb-4">Shop by Category</h2>
+        <div class="row text-center">
+            <% categories.forEach(category => { %>
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm border-0 category-card">
+                        <% if (category.imageUrl) { %>
+                            <img src="<%= category.imageUrl %>" class="card-img-top" alt="<%= category.name %>">
+                        <% } else { %>
+                            <img src="/path/to/default-image.jpg" class="card-img-top" alt="<%= category.name %>">
+                        <% } %>
+                        <div class="card-body">
+                            <h5 class="card-title"><%= category.name %></h5>
+                            <a href="/category/<%= category._id %>/products" class="btn btn-outline-primary">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+<footer class="bg-dark text-light py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>Contact Us</h5>
+                <p>
+                    Email: <a href="mailto:support@example.com" class="text-light">support@example.com</a><br>
+                    Phone: +91 123 456 7890<br>
+                    Address: 1234 Street Name, City, State, 56789
+                </p>
+            </div>
+            <div class="col-md-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="/" class="text-light">Home</a></li>
+                    <li><a href="/about" class="text-light">About Us</a></li>
+                    <li><a href="/services" class="text-light">Services</a></li>
+                    <li><a href="/contact" class="text-light">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Follow Us</h5>
+                <a href="#" class="text-light me-2"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="text-light me-2"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-light"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <hr class="bg-light my-4">
+        <div class="text-center">
+            <p>&copy; 2024 DQ Mall. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Include Font Awesome for social icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMIN5inwXcU5gl/j5D8Y3u73jH0whK86P9R6X" crossorigin="anonymous" />
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

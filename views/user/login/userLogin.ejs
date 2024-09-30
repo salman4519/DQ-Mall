@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #f7f9fc;
+            font-family: 'Arial', sans-serif;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .form-control {
+            border-radius: 20px;
+        }
+        .btn-primary {
+            border-radius: 20px;
+            background-color: #007bff;
+        }
+        .btn-google {
+            background-color: #db4437;
+            color: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-google i {
+            margin-right: 8px;
+        }
+        .text-center a {
+            color: #c7d2dd;
+        }
+        .text-center a:hover {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container login-container">
+        <h3 class="text-center mb-4">Login to Your Account</h3>
+        <% if (message) { %>
+            <div class="alert alert-danger" role="alert">
+                <%= message %>
+            </div>
+        <% } %>
+        <form action="/login" method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="email" name="Username" placeholder="Enter Username" >
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="Password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </form>
+        <div class="text-center mt-3">
+            <p>Or login with</p>
+            <a href="/auth/google" class="btn btn-google btn-block">
+                <i class="fab fa-google"></i> Google
+            </a>
+        </div>
+        <div class="text-center mt-3">
+            <a href="/forgot-password">Forgot Password?</a>
+        </div>
+        <div class="text-center mt-3">
+            <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -56,6 +56,12 @@ adminRoute.get('/categories/delete/:id',adminAuth, adminController.deleteCategor
 adminRoute.post('/users/block/:userId',adminController.blockUser);
 adminRoute.post('/users/unblock/:userId',adminController.unblockUser)
 
+//route for orders
+adminRoute.get('/orders',adminAuth,adminController.getOrders)
+adminRoute.get('/order-details/:orderId',adminAuth,adminController.orderDetails)
+adminRoute.post('/cancel-order',adminController.cancelOrder)
+adminRoute.post('/update-order-status',adminController.updateOrderStatus)
+
 //route for logout 
 adminRoute.get('/logout',adminController.logout)
 

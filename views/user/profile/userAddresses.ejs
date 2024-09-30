@@ -59,7 +59,7 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="Pincode<%= index %>" class="form-label">Pincode</label>
-                                        <input type="number" class="form-control" id="Pincode<%= index %>" name="Pincode" value="<%= address.Pincode %>" required onblur="fetchAddressData(<%= index %>, this.value)">
+                                        <input type="number" class="form-control" id="Pincode<%= index %>" name="Pincode" value="<%= address.Pincode %>" required onblur="fetchAddressData( <%= index %> , this.value)">
                                     </div>
                                     <div class="mb-3">
                                         <label for="City<%= index %>" class="form-label">City</label>
