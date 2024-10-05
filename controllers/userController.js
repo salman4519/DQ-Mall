@@ -2,12 +2,16 @@ const User = require("../models/userModel");
 const Product = require("../models/productModel");
 const Category = require("../models/categoryModel");
 const Cart = require('../models/cartModel');
-const Order = require("../models/orderModel")
+const Order = require("../models/orderModel");
+const Wishlist = require("../models/wishlistModel")
+const Offer = require("../models/offerModel")
 const otpGenerator = require("otp-generator");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const addressModel = require("../models/addressModel");
-const mongoose = require("mongoose")
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
+const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Types; // Correct way to get ObjectId
 require("dotenv").config();
 
@@ -47,10 +51,24 @@ const loadCategoryProducts = async (req, res) => {
       .limit(limit)
       .populate("CategoryId");
 
+    // Fetch applicable offers for the products
+    const applicableOffers = await Offer.find({
+      $or: [
+        { productIds: { $in: products.map(product => product._id) } },
+        { categoryIds: categoryId }
+      ],
+      isActive: true
+    });
+
+    // Logging to check the applicableOffers data
+    console.log('Applicable Offers:', applicableOffers);
+    console.log('Type of applicableOffers:', Array.isArray(applicableOffers)); // Check if it's an array
+
     // Render the category products page with pagination info
     res.render("user/product/listProduct", {
       products,
       category,
+      applicableOffers, // Pass applicableOffers to the view
       currentPage: page,
       totalPages: Math.ceil(totalProducts / limit),
     });
@@ -60,21 +78,61 @@ const loadCategoryProducts = async (req, res) => {
   }
 };
 
+
+
+
 // Controller to load product details
 const loadProductDetails = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).populate(
-      "CategoryId"
-    );
+    const product = await Product.findById(req.params.id).populate("CategoryId");
+
     if (!product) {
       return res.status(404).send("Product not found");
     }
-    res.render("user/product/productDetails", { product });
+
+    // Fetch offers for the product
+    const productOffers = await Offer.find({
+      applicableTo: 'product',
+      productIds: product._id,
+      isActive: true,
+      startTime: { $lte: new Date() },
+      endTime: { $gte: new Date() }
+    });
+
+    // Fetch offers for the category
+    const categoryOffers = await Offer.find({
+      applicableTo: 'category',
+      categoryIds: product.CategoryId, // Ensure this refers to the correct field
+      isActive: true,
+      startTime: { $lte: new Date() },
+      endTime: { $gte: new Date() }
+    });
+
+    // Combine the offers from product and category
+    const offers = [...productOffers, ...categoryOffers];
+
+    // Fetch all products in the same category to see the applicable offers
+    const productsInCategory = await Product.find({
+      CategoryId: product.CategoryId
+    });
+
+    // Combine the offers into a structure that makes sense for display
+    const applicableOffers = {
+      productOffers,
+      categoryOffers,
+      productsInCategory
+    };
+
+    // Render the product details along with the offers
+    res.render("user/product/productDetails", { product, applicableOffers });
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
 };
+
+
+
 
 //controller to get login page
 const getLogin = async (req, res) => {
@@ -344,6 +402,28 @@ const cancelOrder = async (req, res) => {
   }
 };
 
+const returnOrder = async (req, res) => {
+  try {
+      const { orderId } = req.body;
+
+      // Update the order status to 'Cancelled'
+      const updatedOrder = await Order.findOneAndUpdate(
+          { OrderId: orderId, UserId: req.session.userId },
+          { Status: 'Returned' },
+          { new: true } // Return the updated document
+      );
+
+      if (!updatedOrder) {
+          return res.status(404).json({ success: false, message: 'Order not found or already Returned.' });
+      }
+
+      res.json({ success: true, message: 'Order Returned successfully.' });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Error returnung order', error });
+  }
+};
+
 // Change password
 const changePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;
@@ -598,7 +678,7 @@ const getUserAdresses = async (req, res) => {
 //to get userOrder in profile page
 const getUserOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ UserId: req.session.userId }).populate('Products.ProductId');
+    const orders = await Order.find({ UserId: req.session.userId }).populate('Products.ProductId').sort({ createdAt: -1 });
     res.render("user/profile/userOrder",{ orders });
   } catch (error) {
     console.log("get user order broke");
@@ -630,44 +710,62 @@ const getProfileEdit = async (req, res) => {
 
 //to get cart page 
 const getCart = async (req, res) => {
-  const userId = req.session.userId; // Get the user ID from the session
+  const userId = req.session.userId;
 
   if (!userId) {
-    return res.redirect('/login'); // Redirect if user is not logged in
+      return res.redirect('/login');
   }
 
   try {
-    // Fetch the user's cart from the database
-    const cart = await Cart.findOne({ UserId: userId }).populate('Products.ProductId');
+      const cart = await Cart.findOne({ UserId: userId }).populate('Products.ProductId');
 
-    // Check if the cart is null or has no products
-    if (!cart || !cart.Products || cart.Products.length === 0) {
-      return res.render('user/cart/cartPage', {
-        cart: null, // Explicitly send null for the cart
-        cartTotal: 0,
-        isEmpty: true // Flag indicating the cart is empty
+      if (!cart || !cart.Products || cart.Products.length === 0) {
+          return res.render('user/cart/cartPage', {
+              cart: null,
+              cartTotal: 0,
+              isEmpty: true
+          });
+      }
+
+      // Calculate cart total with discounted prices
+      let cartTotal = 0;
+
+      cart.Products.forEach(product => {
+          if (product.ProductId) { // Check if ProductId is valid
+              // Calculate the discounted price if there are offers
+              let discountedPrice = product.Price; // Default to the price stored in the cart
+              const offers = product.ProductId.applicableOffers || []; // Ensure this field is populated in your Product schema
+
+              // Check for applicable offers
+              const activeOffer = offers.find(offer =>
+                  offer.isActive &&
+                  new Date() >= new Date(offer.startTime) &&
+                  new Date() <= new Date(offer.endTime
+              ));
+
+              // Calculate discounted price
+              if (activeOffer) {
+                  discountedPrice = product.Price * (1 - activeOffer.discountPercentage / 100);
+              }
+
+              // Calculate total price with discounted price
+              cartTotal += discountedPrice * (product.Quantity || 1);
+          }
       });
-    }
 
-    // Calculate the total price of the cart
-    const cartTotal = cart.Products.reduce((total, product) => {
-      // Assuming product.ProductId holds the actual product details and price
-      const productPrice = product.ProductId.Price; // Ensure to access the price from the populated ProductId
-      const productQuantity = product.Quantity || 0; // Get the quantity, default to 0 if not defined
-      return total + (productPrice * productQuantity);
-    }, 0);
-
-    // Render the cart page with the populated cart data
-    res.render('user/cart/cartPage', {
-      cart: cart,
-      cartTotal: cartTotal,
-      isEmpty: false // Flag indicating the cart has items
-    });
+      res.render('user/cart/cartPage', {
+          cart: cart,
+          cartTotal: cartTotal,
+          isEmpty: false
+      });
   } catch (error) {
-    console.error("Error fetching cart:", error);
-    res.status(500).json({ message: "Server error" });
+      console.error("Error fetching cart:", error);
+      res.status(500).json({ message: "An error occurred while fetching your cart. Please try again later." });
   }
 };
+
+
+
 
 
 //to update cart
@@ -715,37 +813,43 @@ const removeCart = async (req, res) => {
 
 //to add product to cart
 const addCart = async (req, res) => {
-  const { productId, price, quantity } = req.body;
-  const userId = req.session.userId; // Assuming you have user session management
+  const { productId, quantity } = req.body;
+  const userId = req.session.userId; // Assuming you're using session for user identification
 
   try {
-    // Find or create a cart for the user
-    let cart = await Cart.findOne({ UserId: userId });
+      // Fetch product details including the price
+      const product = await Product.findById(productId);
+      if (!product) {
+          return res.status(404).send('Product not found');
+      }
 
-    if (!cart) {
-      // Create a new cart if it doesn't exist
-      cart = new Cart({
-        UserId: userId,
-        Products: []
-      });
-    }
+      // Check if a cart already exists for the user
+      let cart = await Cart.findOne({ UserId: userId });
+      if (!cart) {
+          // Create a new cart if none exists
+          cart = new Cart({ UserId: userId, Products: [] });
+      }
 
-    // Check if the product is already in the cart
-    const existingProduct = cart.Products.find(product => product.ProductId.toString() === productId);
+      // Check if the product is already in the cart
+      const existingProduct = cart.Products.find(p => p.ProductId.equals(product._id));
+      if (existingProduct) {
+          // Update the quantity if it already exists
+          existingProduct.Quantity += quantity;
+      } else {
+          // Add the new product to the cart
+          cart.Products.push({
+              ProductId: product._id,
+              Price: product.Price, // Make sure to add the Price here
+              Quantity: quantity
+          });
+      }
 
-    if (existingProduct) {
-      // If it exists, update the quantity
-      existingProduct.SelectedQuantity += quantity;
-    } else {
-      // If it doesn't exist, add it to the cart
-      cart.Products.push({ ProductId: productId, SelectedQuantity: quantity, Price: price });
-    }
-
-    await cart.save(); // Save the cart
-    return res.redirect('/cart');
+      // Save the cart
+      await cart.save();
+      res.status(200).json('Product added to cart');
   } catch (error) {
-    console.error('Error adding product to cart:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+      console.error('Error adding product to cart:', error);
+      res.status(500).send('Internal server error');
   }
 };
 
@@ -755,6 +859,7 @@ const getCheckout = async (req, res) => {
     const userId = req.session.userId; // Assuming user is authenticated and you have their ID
     const addresses = await addressModel.find({ UserId: userId }); // Fetch user's addresses
     const cart = await Cart.findOne({ UserId: userId }).populate('Products.ProductId');
+    const user = await User.findOne({ _id:userId})
     let cartTotal = 0;
 
     // Get selected quantities from the request body
@@ -766,7 +871,7 @@ const getCheckout = async (req, res) => {
       cartTotal += product.Price * quantity;
     });
 
-    res.render('user/cart/getCheckout', { addresses, cart, cartTotal });
+    res.render('user/cart/getCheckout', { addresses, cart, cartTotal , user , RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID});
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
@@ -856,64 +961,144 @@ const getSuccess = async(req, res) => {
 };
 
 //to load shop page 
-const getShop = async(req,res)=>{
-  let products = await Product.find({}); // Fetch all products
-    try {
-      res.render("user/shop/shop",{ products}) 
-      
+// Function to load the shop page 
+const getShop = async (req, res) => {
+  try {
+    // Fetch all products with their categories
+    const products = await Product.find({}).populate("CategoryId");
 
-    } catch (error) {
-      console.log("load shop broke",error)
-    }
-}
+    // Fetch applicable offers for these products
+    const applicableOffers = await getApplicableOffersForProducts(products);
+
+    // Attach applicable offers and calculate discounted prices
+    const productsWithOffers = products.map(product => {
+      const productOffers = applicableOffers.filter(offer => 
+          offer.productIds.includes(product._id) || 
+          offer.categoryIds.includes(product.CategoryId)
+      );
+
+      let discountedPrice = product.Price; // Default to the original price
+
+      // If there are applicable offers, calculate the discounted price
+      if (productOffers.length > 0) {
+          const activeOffer = productOffers.find(offer => 
+              offer.isActive && 
+              new Date() >= offer.startTime && 
+              new Date() <= offer.endTime
+          );
+          if (activeOffer) {
+              discountedPrice = product.Price - (product.Price * (activeOffer.discountPercentage / 100));
+          }
+      }
+
+      return {
+          ...product.toObject(),
+          applicableOffers: productOffers,
+          discountedPrice
+      };
+    });
+
+    // Pass productsWithOffers to the view
+    res.render("user/shop/shop", { products: productsWithOffers, userId: req.session.userId || null });
+  } catch (error) {
+    console.error("Error loading shop:", error);
+    res.status(500).send('Server Error');
+  }
+};
+
+
+// Function to get applicable offers for each product
+const getApplicableOffersForProducts = async (products) => {
+  try {
+    const productIds = products.map(product => product._id);
+    
+    // Fetch applicable offers for these products
+    const applicableOffers = await Offer.find({
+      $or: [
+        { productIds: { $in: productIds } },
+        { categoryIds: { $in: products.map(product => product.CategoryId) } }
+      ],
+      isActive: true
+    });
+
+    return applicableOffers;
+  } catch (error) {
+    console.error("Error fetching applicable offers:", error);
+    return []; // Return an empty array on error
+  }
+};
+
+
 
 const loadShopItems = async (req, res) => {
   const { categoryId, priceOrder, arrivalOrder, nameOrder, searchTerm } = req.query;
 
-  // Initialize query with $or for Is_list and isList
+  // Initialize query to filter products
   let query = {
-      $or: [
-          { Is_list: true },
-          { isList: true }
-      ]
+    $or: [
+      { Is_list: true },
+      { isList: true }
+    ]
   };
 
-  // Filter by category, converting categoryId to ObjectId if provided
+  // Filter by category, ensuring categoryId is valid
   if (categoryId && mongoose.isValidObjectId(categoryId)) {
-    query.CategoryId = new mongoose.Types.ObjectId(categoryId); // Correct usage
-}
+    query.CategoryId = new mongoose.Types.ObjectId(categoryId);
+  }
 
-  // Search by name if provided
+  // Search by product name if provided
   if (searchTerm) {
-      query.Name = { $regex: searchTerm, $options: 'i' }; // Case-insensitive search
+    query.Name = { $regex: searchTerm, $options: 'i' }; // Case-insensitive search
   }
 
   try {
-      let products = await Product.find(query);
+    // Fetch products based on query
+    let products = await Product.find(query).populate("CategoryId");
 
-      // Sort products
-      if (priceOrder === 'lowToHigh') {
-          products.sort((a, b) => a.Price - b.Price);
-      } else if (priceOrder === 'highToLow') {
-          products.sort((a, b) => b.Price - a.Price);
-      }
+    // Fetch applicable offers
+    const offers = await Offer.find({
+      $or: [
+        { applicableTo: 'product', productIds: { $in: products.map(product => product._id) } },
+        { applicableTo: 'category', categoryIds: { $in: products.map(product => product.CategoryId) } }
+      ]
+    });
 
-      // Sort by new arrivals (if you have a createdAt date or similar)
-      if (arrivalOrder === 'newest') {
-          products.sort((a, b) => b.createdAt - a.createdAt);
-      }
+    // Map offers to products
+    products = products.map(product => {
+      // Find offers applicable to the product
+      const applicableOffers = offers.filter(offer =>
+        (offer.applicableTo === 'product' && offer.productIds.includes(product._id)) ||
+        (offer.applicableTo === 'category' && offer.categoryIds.includes(product.CategoryId))
+      );
 
-      // Sort by name
-      if (nameOrder === 'aToZ') {
-          products.sort((a, b) => a.Name.localeCompare(b.Name));
-      } else if (nameOrder === 'zToA') {
-          products.sort((a, b) => b.Name.localeCompare(a.Name));
-      }
+      // Return product with applicable offers
+      return { ...product._doc, applicableOffers }; // Merge the product with its applicable offers
+    });
 
-      res.json(products);
+    // Sort products
+    if (priceOrder === 'lowToHigh') {
+      products.sort((a, b) => a.Price - b.Price);
+    } else if (priceOrder === 'highToLow') {
+      products.sort((a, b) => b.Price - a.Price);
+    }
+
+    // Sort by new arrivals based on createdAt timestamp
+    if (arrivalOrder === 'newest') {
+      products.sort((a, b) => b.createdAt - a.createdAt);
+    }
+
+    // Sort products by name
+    if (nameOrder === 'aToZ') {
+      products.sort((a, b) => a.Name.localeCompare(b.Name));
+    } else if (nameOrder === 'zToA') {
+      products.sort((a, b) => b.Name.localeCompare(a.Name));
+    }
+
+    // Return sorted products as JSON
+    res.json(products);
   } catch (error) {
-      console.error(error);
-      res.status(500).send('Server Error');
+    console.error("Error loading shop items:", error);
+    res.status(500).send('Server Error');
   }
 };
 
@@ -921,15 +1106,184 @@ const loadShopItems = async (req, res) => {
 
 const shopCategoryItems = async (req, res) => {
   try {
-      const categories = await Category.find({ isList:true }); // Fetch all categories from the database
-      res.json(categories); // Send categories as a JSON response
+    // Fetch all categories that are marked as available for listing
+    const categories = await Category.find({ isList: true }); 
+    res.json(categories); // Send categories as a JSON response
   } catch (error) {
-      console.error(error);
-      res.status(500).send('Server Error'); // Handle errors gracefully
+    console.error("Error loading categories:", error);
+    res.status(500).send('Server Error'); // Handle errors gracefully
   }
 };
 
 
+const loadWishlist = async (req, res) => {
+  try {
+      const userId = req.session.userId;
+      if (!userId) {
+          return res.status(400).send('User is not logged in');
+      }
+
+      // Find the user's wishlist
+      const wishlist = await Wishlist.findOne({ UserId: userId }).populate('products');
+
+      // Check if the wishlist exists
+      if (!wishlist) {
+          return res.status(404).send('Wishlist not found');
+      }
+
+      // Render the wishlist page and pass the products directly
+      res.render('user/cart/wishlistPage', { products: wishlist.products });
+  } catch (error) {
+      console.log("Error loading wishlist:", error);
+      res.status(500).send('Server error');
+  }
+};
+
+
+
+
+const addProductToWishlist = async (req, res) => {
+  const userId = req.session.userId; // Accessing the userId from session
+
+  if (!userId) {
+      return res.status(400).send('User is not logged in');
+  }
+
+  try {
+      // Add product to wishlist logic
+      const { ProductId } = req.body; // Make sure the request body contains ProductId
+      const wishlist = await Wishlist.findOneAndUpdate(
+          { UserId: userId },
+          { $addToSet: { products: ProductId } }, // Use the correct field name 'products'
+          { upsert: true, new: true }
+      ).populate('products'); // Optional: Populate the products to return full product details
+
+      res.status(200).json({ message: 'Product added to wishlist', wishlist });
+  } catch (error) {
+      console.error('Error adding product to wishlist:', error);
+      res.status(500).json({ message: 'Error adding product to wishlist' });
+  }
+};
+
+
+
+const removeProductFromWishlist = async (req, res) => {
+  try {
+      const { productId } = req.body; // Ensure you're accessing productId correctly
+      const userId = req.session.userId;
+
+      if (!userId) {
+          return res.status(400).json({ message: 'User is not logged in' });
+      }
+
+      const wishlist = await Wishlist.findOne({ UserId: userId });
+
+      if (!wishlist) {
+          return res.status(404).json({ message: 'Wishlist not found' });
+      }
+
+      // Check if productId is valid
+      if (!productId) {
+          return res.status(400).json({ message: 'Product ID is required' });
+      }
+
+      // Remove product from wishlist
+      wishlist.products = wishlist.products.filter(p => p.toString() !== productId);
+
+      await wishlist.save();
+      res.status(200).json({ message: 'Product removed from wishlist' });
+  } catch (err) {
+      console.error('Error removing product from wishlist:', err);
+      res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+const getWishlist = async (req, res) => {
+  try {
+      const userId = req.session.userId;
+
+      const wishlist = await Wishlist.findOne({ userId }).populate('products');
+
+      if (!wishlist || wishlist.products.length === 0) {
+          return res.status(404).json({ message: 'No products in wishlist' });
+      }
+
+      res.status(200).json(wishlist.products);
+  } catch (err) {
+      console.error('Error fetching wishlist:', err);
+      res.status(500).json({ error: 'Server error' });
+  }
+};
+
+// Initialize Razorpay instance with your key ID and secret
+const razorpayInstance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID, // Replace with your Razorpay key ID
+  key_secret: process.env.RAZORPAY_KEY_SECRET, // Replace with your Razorpay key secret
+});
+
+const createRazorpayOrder = async (req, res) => {
+  try {
+      const { amount } = req.body; // Amount in paise (multiply by 100 on frontend)
+
+      const options = {
+          amount: amount, // Amount in paise (e.g., Rs. 500 = 50000 paise)
+          currency: 'INR',
+          receipt: `receipt_order_${Date.now()}`,
+      };
+
+      // Create order on Razorpay
+      const order = await razorpayInstance.orders.create(options);
+
+      if (!order) return res.status(500).json({ message: 'Failed to create order' });
+
+      // Send back the order details
+      res.status(200).json({
+          id: order.id,
+          amount: order.amount,
+          currency: order.currency,
+      });
+  } catch (error) {
+      console.error('Error creating Razorpay order:', error);
+      res.status(500).json({ message: 'Error creating Razorpay order' });
+  }
+};
+
+
+const verifyPaymentAndSaveOrder = async (req, res) => {
+  try {
+      const { razorpay_order_id, razorpay_payment_id, razorpay_signature, Products, TotalPrice, ShippingAddress } = req.body;
+
+      // Verify the payment signature
+      const shasum = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET); // Use Razorpay Key Secret
+      shasum.update(`${razorpay_order_id}|${razorpay_payment_id}`);
+      const generatedSignature = shasum.digest('hex');
+
+      if (generatedSignature !== razorpay_signature) {
+          return res.status(400).json({ message: 'Invalid payment signature' });
+      }
+
+      // Save the order to the database after payment verification
+      const newOrder = new Order({
+          Products,
+          TotalPrice,
+          ShippingAddress,
+          PaymentMethod: 'razorpay',
+          PaymentDetails: {
+              orderId: razorpay_order_id,
+              paymentId: razorpay_payment_id,
+          },
+          Status: 'Paid', // Update status after payment
+      });
+
+      await newOrder.save();
+
+      res.status(200).json({ orderId: newOrder._id, message: 'Order placed successfully' });
+  } catch (error) {
+      console.error('Error verifying payment and saving order:', error);
+      res.status(500).json({ message: 'Error processing payment' });
+  }
+};
 
 
 module.exports = {
@@ -969,6 +1323,13 @@ module.exports = {
   getSuccess,
   getShop,
   loadShopItems,
-  shopCategoryItems
+  shopCategoryItems,
+  getWishlist,
+  addProductToWishlist,
+  removeProductFromWishlist,
+  loadWishlist,
+  createRazorpayOrder,
+  verifyPaymentAndSaveOrder,
+  returnOrder
 
 };

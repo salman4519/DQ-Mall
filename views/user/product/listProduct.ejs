@@ -50,6 +50,7 @@
             height: 250px;
             object-fit: cover;
             transition: transform 0.3s ease;
+            cursor: pointer; /* Make image clickable */
         }
 
         .card:hover {
@@ -70,7 +71,10 @@
             font-weight: 600;
         }
 
-        
+        /* Add to Cart and Wishlist buttons */
+        .btn-add {
+            margin-top: 10px;
+        }
 
         /* Pagination Styles */
         .pagination {
@@ -106,7 +110,7 @@
                     <a class="nav-link" href="/shop"><i class="bi bi-shop"></i></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="bi bi-bag-heart"></i></a>
+                    <a class="nav-link" href="/wishlist"><i class="bi bi-bag-heart"></i></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/cart"><i class="bi bi-cart-dash"></i></a>
@@ -123,7 +127,6 @@
                 </li>
             </ul>
         </div>
-        
     </nav>
 
     <!-- Breadcrumbs -->
@@ -134,7 +137,6 @@
         </ol>
     </div>
 
-
     <!-- Category Name and Products -->
     <div class="container mt-4">
         <h2 class="text-center mb-4">Products in <%= category.name %></h2>
@@ -143,19 +145,55 @@
                 <% products.forEach(product => { %>
                     <div class="col-sm-6 col-md-4 col-lg-3">
                         <div class="card h-100">
-                            <img src="/uploads/<%= product.Images[0] %>" class="card-img-top" alt="<%= product.name %>">
+                            <img src="/uploads/<%= product.Images[0] %>" class="card-img-top" alt="<%= product.Name %>" onclick="quickView('<%= product._id %>')">
                             <div class="card-body text-center">
                                 <h5 class="card-title"><%= product.Name %></h5>
-                                <p class="card-text">$<%= product.Price %></p>
-                                <a href="/product/<%= product._id %>" class="btn btn-primary btn-block">Quick view</a>
+                
+                                <% 
+                                    let hasOffer = false;
+                                    let discountedPrice = product.Price; // Start with the original price
+                                    let applicableOffer = null;
+                
+                                    // Check for applicable offers for this product
+                                    if (Array.isArray(applicableOffers)) {
+                                        applicableOffers.forEach(currentOffer => {
+                                            if (currentOffer.applicableTo === 'product' && currentOffer.productIds.includes(product._id)) {
+                                                hasOffer = true; // Offer applies to this product
+                                                discountedPrice = product.Price - (product.Price * (currentOffer.discountPercentage / 100));
+                                                applicableOffer = currentOffer; // Store the current offer
+                                            }
+                                        });
+                                    }
+                                %>
+                
+                                <% if (hasOffer) { %>
+                                    <span style="text-decoration: line-through;">$<%= product.Price.toFixed(2) %></span>
+                                    <strong class="text-success">  $<%= discountedPrice.toFixed(2) %> </strong>
+                                <% } else { %>
+                                    $<%= product.Price.toFixed(2) %>
+                                <% } %>
+                
+                                <% if (product.Quantity === 0) { %>
+                                    <p class="text-danger"><strong>Out of Stock</strong></p>
+                                    <button class="btn btn-primary addToCartBtn" style="display: none;" disabled>Add to Cart</button>
+                                <% } else { %>
+                                    <p><strong>Quantity:</strong> <%= product.Quantity %></p>
+                                    <button class="btn btn-primary addToCartBtn" data-product-id="<%= product._id %>" data-price="<%= product.Price %>">Add to Cart</button>
+                                <% } %>
+                
+                                <!-- Wishlist Button -->
+                                <button id="addToWishlistBtn" class="btn btn-dark mt-2" data-product-id="<%= product._id %>">
+                                    <i class="bi bi-heart"></i> 
+                                </button>
                             </div>
                         </div>
                     </div>
                 <% }) %>
-            <% } else { %>
-                <p class="text-center">No products found in this category.</p>
-            <% } %>
-        </div>
+                
+                <% } %>
+                
+    
+    
 
         <!-- Pagination Controls -->
         <nav aria-label="Page navigation">
@@ -186,6 +224,63 @@
     </div>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+     <script>
+        function quickView(productId) {
+            window.location.href = `/product/${productId}`; // Redirect to the product detail page
+        }
+     </script>
+    <script>
+        $(document).ready(function() {
+            // Handle Add to Cart button click
+            $('.addToCartBtn').on('click', function() {
+                const productId = $(this).data('product-id');
+                const price = $(this).data('price');
+                const quantity = 1; // Default quantity set to 1
+    
+                $.ajax({
+                    url: '/cart/add', // Server endpoint to handle adding the product to the cart
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ productId, price, quantity }),
+                    success: function(response) {
+                        alert('Product added to cart!');
+                    },
+                    error: function(error) {
+                        console.error('Error adding to cart:', error);
+                        alert('Failed to add product to cart. Please try again.');
+                    }
+                });
+            });
+
+            
+            });
+       
+    </script>
+    <script>
+        $(document).ready(function() {
+    $('#addToWishlistBtn').on('click', function() {
+        const productId = $(this).data('product-id');
+        
+        $.ajax({
+            url: '/wishlist/add', // Server endpoint to handle adding product to wishlist
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ ProductId: productId }), // Match the key with your backend
+            success: function(response) {
+                alert('Product added to wishlist!');
+            },
+            error: function(error) {
+                console.error('Error adding to wishlist:', error);
+                alert('Failed to add product to wishlist. Please try again.');
+            }
+        });
+    });
+});
+    </script>
 </body>
 </html>

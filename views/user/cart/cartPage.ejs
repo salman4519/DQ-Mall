@@ -265,33 +265,41 @@
             });
 
             // Remove item button click event
-            $('.remove-item').on('click', function () {
-                const productId = $(this).data('product-id'); // Get the product ID from the button
-                const cartData = JSON.parse(localStorage.getItem('cart')) || {};
+$('.remove-item').on('click', function () {
+    const productId = $(this).data('product-id'); // Get the product ID from the button
 
-                // Remove the product from local storage
-                delete cartData[productId];
-                localStorage.setItem('cart', JSON.stringify(cartData));
+    // Show confirmation alert
+    const confirmed = confirm('Are you sure you want to remove this item from the cart?');
+    
+    // If the user confirms the action
+    if (confirmed) {
+        const cartData = JSON.parse(localStorage.getItem('cart')) || {};
 
-                // Optionally, make an AJAX request to delete the product from the database
-                $.ajax({
-                    type: 'DELETE',
-                    url: `/cart/${productId}`, // Adjust this URL to your delete endpoint
-                    success: function (response) {
-                        // Remove the product item from the UI
-                        $(this).closest('.product-item').remove();
-                        updateTotalPrice(); // Update the total price after deletion
-                    }.bind(this), // Bind 'this' to maintain context
-                    error: function (error) {
-                        // Handle error, e.g., show an error message
-                        alert('Failed to delete item. Please try again.');
-                    }
-                });
+        // Remove the product from local storage
+        delete cartData[productId];
+        localStorage.setItem('cart', JSON.stringify(cartData));
 
-                // Also remove from the UI immediately (optional)
+        // Make an AJAX request to delete the product from the database
+        $.ajax({
+            type: 'DELETE',
+            url: `/cart/${productId}`, // Adjust this URL to your delete endpoint
+            success: function (response) {
+                // Remove the product item from the UI
                 $(this).closest('.product-item').remove();
                 updateTotalPrice(); // Update the total price after deletion
-            });
+            }.bind(this), // Bind 'this' to maintain context
+            error: function (error) {
+                // Handle error, e.g., show an error message
+                alert('Failed to delete item. Please try again.');
+            }
+        });
+
+        // Also remove from the UI immediately (optional)
+        $(this).closest('.product-item').remove();
+        updateTotalPrice(); // Update the total price after deletion
+    }
+});
+
 
             // Function to update total price
             function updateTotalPrice() {

@@ -1,97 +1,81 @@
-<%- include('../layouts/header.ejs') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .student-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .student-list li {
+            margin-bottom: 5px;
+        }
+        .submit-btn {
+            margin-top: 20px;
+        }
+        .result {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
 
+    <h2>Mark Attendance - 27/09/2024</h2>
+    
+    <form id="attendance-form">
+        <ul class="student-list">
+            <li><input type="checkbox" id="roshan" name="student" value="Roshan Jabir"> Roshan Jabir (Lated)</li>
+            <li><input type="checkbox" id="adhnan" name="student" value="Adhnan P"> Adhnan P (Lated)</li>
+            <li><input type="checkbox" id="riyaspp" name="student" value="Riyas P P"> Riyas P P</li>
+            <li><input type="checkbox" id="thaha" name="student" value="Thaha Yaseen"> Thaha Yaseen</li>
+            <li><input type="checkbox" id="kuriyan" name="student" value="Kuriyan John"> Kuriyan John</li>
+            <li><input type="checkbox" id="hashim" name="student" value="Muhammed Hashim"> Muhammed Hashim</li>
+            <li><input type="checkbox" id="minhaj" name="student" value="Muhammed Minhaj"> Muhammed Minhaj</li>
+            <li><input type="checkbox" id="shahana" name="student" value="Shahana Sherin"> Shahana Sherin</li>
+            <li><input type="checkbox" id="rafan" name="student" value="Muhammed Rafan M"> Muhammed Rafan M</li>
+            <li><input type="checkbox" id="shamir" name="student" value="Muhammed Shamir A K"> Muhammed Shamir A K</li>
+            <li><input type="checkbox" id="siraajudeen" name="student" value="Muhammed Siraajudeen"> Muhammed Siraajudeen</li>
+            <li><input type="checkbox" id="sharafath" name="student" value="Sharafath Abil Has PP"> Sharafath Abil Has PP</li>
+            <li><input type="checkbox" id="riyas-kp" name="student" value="Muhammed Riyas KP"> Muhammed Riyas KP</li>
+            <li><input type="checkbox" id="rashid" name="student" value="Muhammed Rashid N"> Muhammed Rashid N</li>
+            <li><input type="checkbox" id="nihal" name="student" value="Muhammed Nihal CP"> Muhammed Nihal CP</li>
+            <li><input type="checkbox" id="siyad" name="student" value="Siyad Muhsin K"> Siyad Muhsin K</li>
+            <li><input type="checkbox" id="abhinand" name="student" value="Abhinand SD"> Abhinand SD</li>
+        </ul>
+        <button type="submit" class="submit-btn">Submit Attendance</button>
+    </form>
 
-<%- include('../layouts/sidebar.ejs') %>
-
-      <!-- partial -->
-       
-      <div class="main-panel">
-        <div class="content-wrapper">
-            <div class="row">
-                <div class="col-12 grid-margin stretch-card">
-                  <div class="card corona-gradient-card">
-                    <div class="card-body py-0 px-0 px-sm-3">
-                      <div class="row align-items-center">
-                        <div class="col-4 col-sm-3 col-xl-2">
-                          <img src="assets/images/dashboard/Group126@2x.png" class="gradient-corona-img img-fluid" alt="">
-                        </div>
-                        <div class="col-5 col-sm-7 col-xl-8 p-0 ">
-                          <h1 class="mb-1 mb-sm-0">User Management</h1>
-                          
-                        </div>
-                        <div class="col-3 col-sm-2 col-xl-2 pl-0 text-center">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-12 grid-margin stretch-card">
-                  <div class="card">
-                    <div class="card-body">
-                      <h4 class="card-title">Basic Table</h4>
-                      <p class="card-description"> Add class <code>.table</code>
-                      </p>
-                      <div class="table-responsive">
-                        <table class="table">
-                          <thead>
-                            <tr>
-                              <th>Profile</th>
-                              <th>VatNo.</th>
-                              <th>Created</th>
-                              <th>Status</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>Jacob</td>
-                              <td>53275531</td>
-                              <td>12 May 2017</td>
-                              <td><label class="badge badge-danger">Pending</label></td>
-                            </tr>
-                            <tr>
-                              <td>Messsy</td>
-                              <td>53275532</td>
-                              <td>15 May 2017</td>
-                              <td><label class="badge badge-warning">In progress</label></td>
-                            </tr>
-                            <tr>
-                              <td>John</td>
-                              <td>53275533</td>
-                              <td>14 May 2017</td>
-                              <td><label class="badge badge-info">Fixed</label></td>
-                            </tr>
-                            <tr>
-                              <td>Peter</td>
-                              <td>53275534</td>
-                              <td>16 May 2017</td>
-                              <td><label class="badge badge-success">Completed</label></td>
-                            </tr>
-                            <tr>
-                              <td>Dave</td>
-                              <td>53275535</td>
-                              <td>20 May 2017</td>
-                              <td><label class="badge badge-warning">In progress</label></td>
-                            </tr>
-                          </tbody>
-                        </table>
-        </div>
-        
-        <!-- content-wrapper ends -->
-        <!-- partial:../../partials/_footer.html -->
-        <!-- <footer class="footer">
-          <div class="d-sm-flex justify-content-center justify-content-sm-between">
-            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
-            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates</a> from Bootstrapdash.com</span>
-          </div>
-        </footer> -->
-        <!-- partial -->
-      </div>
-      <!-- main-panel ends -->
+    <div class="result">
+        <h3>Absentees:</h3>
+        <p id="absentees-list">None</p>
     </div>
-    <!-- page-body-wrapper ends -->
-  </div>
-  
 
-<%- include('../layouts/footer.ejs') %>
+    <script>
+        const attendanceForm = document.getElementById('attendance-form');
+        const absenteesList = document.getElementById('absentees-list');
+
+        attendanceForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(attendanceForm);
+            const students = document.querySelectorAll('input[name="student"]');
+            const absentees = [];
+
+            students.forEach(student => {
+                if (!student.checked) {
+                    absentees.push(student.value);
+                }
+            });
+
+            absenteesList.textContent = absentees.length > 0 ? absentees.join(', ') : 'None';
+        });
+    </script>
+
+</body>
+</html>

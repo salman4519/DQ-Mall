@@ -34,8 +34,10 @@
         .card img {
             border-top-left-radius: 15px;
             border-top-right-radius: 15px;
-            height: 250px; /* Adjust height as needed */
-            object-fit: cover; /* Ensure images cover the card */
+            height: 250px;
+            /* Adjust height as needed */
+            object-fit: cover;
+            /* Ensure images cover the card */
         }
 
         .card-title {
@@ -74,11 +76,13 @@
         }
 
         .navbar-nav .nav-link i {
-            font-size: 1.5rem; /* Adjust this size */
+            font-size: 1.5rem;
+            /* Adjust this size */
         }
 
         .navbar-nav .nav-item {
-            margin-right: 15px; /* Adjust this value for more or less space */
+            margin-right: 15px;
+            /* Adjust this value for more or less space */
         }
 
         .navbar-brand-logo {
@@ -92,7 +96,7 @@
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand d-flex align-items-center" href="#">
+        <a class="navbar-brand d-flex align-items-center" href="/shop">
             <img src="/users/images/logo2.png" alt="Kenza Store Logo" class="navbar-brand-logo">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -105,10 +109,10 @@
                     <a class="nav-link" href="/home"><i class="bi bi-house"></i></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="bi bi-shop"></i></a>
+                    <a class="nav-link" href="/shop"><i class="bi bi-shop"></i></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="bi bi-bag-heart"></i></a>
+                    <a class="nav-link" href="/wishlist"><i class="bi bi-bag-heart"></i></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/cart"><i class="bi bi-cart-dash"></i></a>
@@ -177,6 +181,7 @@
             </div>
 
             <!-- Product Grid Section -->
+            <!-- Product Grid Section -->
             <div class="col-md-9">
                 <div class="form-group mb-4">
                     <input type="text" id="searchInput" class="form-control" placeholder="Search by product name">
@@ -185,6 +190,7 @@
                     <!-- Product items will be dynamically populated here -->
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -198,7 +204,7 @@
             const newArrivalFilter = document.getElementById("newArrivalFilter");
             const nameFilter = document.getElementById("nameFilter");
             const searchInput = document.getElementById("searchInput");
-    
+
             // Fetch categories from the server and populate the category filter
             function fetchCategories() {
                 fetch('/load-categories') // Your API endpoint for categories
@@ -213,11 +219,11 @@
                     })
                     .catch(error => console.error('Error fetching categories:', error));
             }
-    
+
             // Fetch products from the server
             function fetchProducts(queryParams = {}) {
                 let queryString = new URLSearchParams(queryParams).toString();
-    
+
                 fetch(`/load-items?${queryString}`) // Your API endpoint with dynamic query string
                     .then(response => response.json())
                     .then(products => {
@@ -225,33 +231,153 @@
                     })
                     .catch(error => console.error('Error fetching products:', error));
             }
-    
+
+            // Display products in the grid
+
             // Display products in the grid
             function displayProducts(products) {
                 productGrid.innerHTML = ''; // Clear existing products
-    
+
                 if (products.length > 0) {
                     products.forEach(product => {
                         const productCol = document.createElement('div');
                         productCol.className = 'col-sm-6 col-md-4 col-lg-3 mb-4'; // Adjust based on number of products in a row
-    
+
+                        // Check if the product quantity is 0
+                        const outOfStock = product.Quantity === 0; // Assuming 'Quantity' is the field in your product model
+
+                        // Check for applicable offers
+                        const offers = product.applicableOffers || []; // Get applicable offers for this product
+                        console.log("The offers for product", product.Name, "are", offers);
+
+                        // Calculate discounted price if there are offers
+                        let discountedPrice = product.Price; // Original price
+                        if (offers.length > 0) {
+                            // Find the best applicable offer
+                            const activeOffer = offers.find(offer =>
+                                offer.isActive &&
+                                new Date() >= new Date(offer.startTime) &&
+                                new Date() <= new Date(offer.endTime)
+                            );
+
+                            console.log("Active offer found:", activeOffer); // Log the active offer
+
+                            // Calculate discounted price if there is an active offer
+                            if (activeOffer) {
+                                discountedPrice = product.Price * (1 - activeOffer.discountPercentage / 100);
+                                console.log(`Discounted price calculated: $${discountedPrice.toFixed(2)}`); // Log discounted price
+                            } else {
+                                console.log("No active offer available.");
+                            }
+                        }
+
                         productCol.innerHTML = `
-                            <div class="card shadow-sm border-0">
-                                <img src="/uploads/${product.Images[0]}" class="card-img-top" alt="${product.Name}">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">${product.Name}</h5>
-                                    <p class="card-text">$${product.Price.toFixed(2)}</p>
-                                    <a href="/product/${product._id}" class="btn btn-primary btn-block">Quick view</a>
-                                </div>
-                            </div>
-                        `;
+                <div class="card shadow-sm border-0">
+                    <a href="/product/${product._id}">
+                        <img src="/uploads/${product.Images[0]}" class="card-img-top" alt="${product.Name}">
+                    </a>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${product.Name}</h5>
+                        <p class="card-text">
+                            ${offers.length > 0
+                                ? `<span class="text-danger" style="text-decoration: line-through;">$${product.Price.toFixed(2)}</span> 
+                                   <span class="text-success">$${discountedPrice.toFixed(2)}</span>`
+                                : `<span class="">$${product.Price.toFixed(2)}</span>`}
+                        </p>
+
+                        <!-- Conditionally render button or out of stock message -->
+                        ${outOfStock
+                                ? '<span class="text-danger">Out of Stock</span>'
+                                : `<button class="btn btn-primary add-to-cart-btn" 
+    data-product-id="${product._id}" 
+    data-price="${discountedPrice.toFixed(2)}" 
+    data-discounted-price="${discountedPrice.toFixed(2)}">
+    Add to Cart
+</button>
+
+`}
+                        
+                        <!-- Add to Wishlist Button -->
+                        <button class="btn btn-outline-secondary add-to-wishlist-btn" data-product-id="${product._id}">
+                            <i class="bi bi-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
                         productGrid.appendChild(productCol);
                     });
+
+                    // Attach event listeners to the buttons after products are rendered
+                    attachButtonListeners();
                 } else {
                     productGrid.innerHTML = `<p class="text-center">No products found.</p>`;
                 }
             }
-    
+
+
+
+
+
+
+            function attachButtonListeners() {
+                // Add to Cart Button
+                document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+    button.addEventListener('click', function () {
+        const productId = this.getAttribute('data-product-id');
+        
+        // Retrieve the discounted price
+        const discountedPrice = parseFloat(this.getAttribute('data-discounted-price')) || parseFloat(this.getAttribute('data-price'));
+        
+        const quantity = 1; // Default quantity
+        
+        // Send AJAX request to add to cart
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId, price: discountedPrice, quantity })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.message) {
+                    alert('Product added to cart!');
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('Error adding to cart:', error));
+    });
+});
+
+                // Add to Wishlist Button
+                document.querySelectorAll('.add-to-wishlist-btn').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const productId = this.getAttribute('data-product-id');
+
+                        // Send AJAX request to add to wishlist
+                        fetch('/wishlist/add', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ ProductId: productId })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.message) {
+                                    alert(data.message);
+                                } else {
+                                    alert('Product added to wishlist!');
+                                }
+                            })
+                            .catch(error => console.error('Error adding to wishlist:', error));
+                    });
+                });
+            }
+
+
+
             // Combine all filters into a single object and fetch products
             function getFilters() {
                 return {
@@ -263,14 +389,14 @@
                     // No need to include isList here since it's handled in the backend
                 };
             }
-    
+
             // Fetch all products on page load
             fetchProducts(); // This will fetch all products initially
             fetchCategories(); // Fetch categories to populate the dropdown
-    
+
             // Filter functionality
             const updateProductDisplay = () => fetchProducts(getFilters());
-    
+
             // Attach event listeners for filters
             categoryFilter.addEventListener("change", updateProductDisplay);
             priceFilter.addEventListener("change", updateProductDisplay);

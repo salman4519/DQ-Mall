@@ -12,13 +12,13 @@
                             <div class="card-header d-flex justify-content-between align-items-center
                                 <% if (order.Status === 'Delivered') { %>
                                     bg-success text-white
-                                <% } else if (order.Status === 'Shpped') { %>
+                                <% } else if (order.Status === 'Returned') { %>
                                     bg-warning text-dark
                                 <% } else if (order.Status === 'Cancelled') { %>
                                     bg-danger text-white
                                 <% } %>">
                                 <h5 class="mb-0">Order ID: <%= order.OrderId %></h5>
-                                <span class="badge badge-<%= order.Status === 'Delivered' ? 'success' :order.Status === 'Pending' ? 'warning' : order.Status === 'Shipped' ? 'primary' :  'danger' %>">
+                                <span class="badge badge-<%= order.Status === 'Returned' ? 'warning' : order.Status === 'Delivered' ? 'success' : order.Status === 'Pending' ? 'dark' : order.Status === 'Shipped' ? 'primary' :  'danger' %>">
                                     <%= order.Status %>
                                 </span>
                             </div>
@@ -53,8 +53,10 @@
                                     </tbody>
                                 </table>
 
-                                <% if (order.Status === 'Pending' || order.Status === 'Shipped' ) { %>
+                                <% if (order.Status === 'Pending' || order.Status === 'Shipped') { %>
                                     <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order.OrderId %>">Cancel Order</button>
+                                <% } else if (order.Status === 'Delivered') { %>
+                                    <button class="btn btn-warning return-order-btn" data-order-id="<%= order.OrderId %>">Return Order</button>
                                 <% } %>
                             </div>
                         </div>
@@ -96,6 +98,37 @@
                 .catch(error => {
                     console.error('Error:', error);
                     alert('An error occurred while canceling the order.');
+                });
+            }
+        });
+    });
+
+    // Handle return order button click
+    document.querySelectorAll('.return-order-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const orderId = this.dataset.orderId;
+            const confirmation = confirm('Are you sure you want to return this order?');
+
+            if (confirmation) {
+                // Send request to return order
+                fetch('/return-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ orderId: orderId }),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Order returned successfully.');
+                        location.reload(); // Refresh the page to show updated order status
+                    } else {
+                        alert('Failed to return order. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while returning the order.');
                 });
             }
         });

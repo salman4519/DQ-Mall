@@ -3,6 +3,7 @@ const model = require("../models/userModel")
 const Product = require("../models/productModel")
 const Category = require("../models/categoryModel")
 const Order = require("../models/orderModel")
+const Offer = require('../models/offerModel');
 const bcrypt = require("bcrypt")
 const path = require('path')
 const fs = require('fs')
@@ -494,7 +495,7 @@ const getOrders = async(req,res)=>{
     const limit = 5; // Number of categories per page
     const skip = (page - 1) * limit; // Calculate how many categories to skip
 
-        const orders = await Order.find({}).skip(skip).limit(limit)
+        const orders = await Order.find({}).skip(skip).limit(limit).sort({ createdAt: -1 });
         const totalOrders = await Order.countDocuments(); 
 
     try {
@@ -592,6 +593,32 @@ const cancelOrder = async (req, res) => {
     }
   };
 
+  const returnOrder = async (req, res) => {
+    const { orderId } = req.body;
+  
+    try {
+      // Find the order by ID
+      const order = await Order.findOne({ OrderId: orderId });
+      if (!order) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+  
+      // Check if the status can be updated
+      if (order.Status === 'Cancelled' ||  order.Status === 'Returned') {
+        return res.status(400).json({ message: 'Cannot return this order' });
+      }
+  
+      // Update the order status to 'Cancelled'
+      order.Status = 'Returned';
+      await order.save();
+  
+      res.status(200).json({ message: 'Order status updated successfully', order });
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+
   const updateOrderStatus = async (req, res) => {
     const { orderId, newStatus } = req.body;
   
@@ -618,33 +645,195 @@ const cancelOrder = async (req, res) => {
     }
   };
   
-  // Controller function to cancel an order
-  exports.cancelOrder = async (req, res) => {
-    const { orderId } = req.body;
+ 
+  const  getOffer = async (req, res) => {
+    try {
+        const products = await Product.find({ Is_list: true });
+        const categories = await Category.find({ isList: true })
+        const offers = await Offer.find().populate('productIds', 'Name') // Assuming 'Name' is the field for product names
+        .populate('categoryIds', 'name') // Assuming 'Name' is the field for category names // Fetch all offers
+        res.render('admin/getOffer', { offers , products , categories });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+};
+
+
+const getEditOffer = async (req, res) => {
+    try {
+        // Extract offer ID from request parameters
+        const { offerId } = req.params; 
+
+        // Fetch the specific offer by ID and populate related product and category data
+        const offer = await Offer.findById(offerId)
+            .populate('productIds', 'Name') // Assuming 'Name' is the field for product names
+            .populate('categoryIds', 'Name'); // Assuming 'Name' is the field for category names
+
+        // Fetch all products and categories that are listed
+        const products = await Product.find({ Is_list: true });
+        const categories = await Category.find({ isList: true });
+
+        // Render the edit offer page with the offer data, products, and categories
+        res.render('admin/editOffer', { offer, products, categories });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+};
+
+const updateOffer = async (req, res) => {
+    try {
+        const { id } = req.params; // Get offer ID from URL parameters
+        const { name, discountPercentage, applicableTo, productIds, categoryIds, startTime, endTime } = req.body;
+
+        // Create an object with the updated offer details
+        const updatedOffer = {
+            name,
+            discountPercentage,
+            applicableTo,
+            productIds: productIds ? productIds : [], // Use the provided productIds or default to an empty array
+            categoryIds: categoryIds ? categoryIds : [], // Use the provided categoryIds or default to an empty array
+            startTime,
+            endTime,
+        };
+
+        // Update the offer in the database
+        const offer = await Offer.findByIdAndUpdate(id, updatedOffer, { new: true });
+
+        if (!offer) {
+            return res.status(404).send('Offer not found');
+        }
+
+        // Redirect to offers list page or send a success message
+        res.redirect('/admin/offers');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+};
+
+  const  getAddOffer = async (req, res) => {
+        const products = await Product.find({ Is_list: true });
+        const categories = await Category.find({ isList: true })
   
     try {
-      // Find the order by ID
-      const order = await Order.findOne({ OrderId: orderId });
-      if (!order) {
-        return res.status(404).json({ message: 'Order not found' });
-      }
-  
-      // Check if the status can be updated
-      if (order.Status === 'Cancelled' || order.Status === 'Delivered') {
-        return res.status(400).json({ message: 'Cannot cancel this order' });
-      }
-  
-      // Update the order status to 'Cancelled'
-      order.Status = 'Cancelled';
-      await order.save();
-  
-      res.status(200).json({ message: 'Order status updated successfully', order });
+        res.render("admin/addOffer",{ message : "", products ,categories })
     } catch (error) {
-      console.error('Error updating order status:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      console.log(" get add offer broke")
     }
   };
 
+
+  const addOffer = async (req, res) => {
+    try {
+        const { name, discountPercentage, applicableTo, productIds, categoryIds, startTime, endTime } = req.body;
+
+        // Validate inputs
+        if (!name || !discountPercentage || !applicableTo || !startTime || !endTime) {
+            return res.status(400).json({ error: 'Please fill in all required fields.' });
+        }
+
+        if (applicableTo === 'product' && (!productIds || productIds.length === 0)) {
+            return res.status(400).json({ error: 'Please select at least one product.' });
+        }
+
+        if (applicableTo === 'category' && (!categoryIds || categoryIds.length === 0)) {
+            return res.status(400).json({ error: 'Please select at least one category.' });
+        }
+
+        // Prepare offer data
+        const newOffer = new Offer({
+            name, // Added the name field
+            discountPercentage,
+            applicableTo,
+            productIds: applicableTo === 'product' ? productIds : [],
+            categoryIds: applicableTo === 'category' ? categoryIds : [],
+            startTime,
+            endTime
+        });
+
+        // Save offer to the database
+        await newOffer.save();
+        res.redirect('/admin/offers');
+
+    } catch (error) {
+        console.error('Error adding offer:', error);
+        res.status(500).json({ error: 'Server error. Please try again later.' });
+    }
+};
+
+const deactivateOffer = async (req, res) => {
+    try {
+        const { id } = req.params; // Get offer ID from URL parameters
+
+        // Find the offer and update its status
+        const offer = await Offer.findByIdAndUpdate(
+            id,
+            { isActive: false }, // Assuming you have an isActive field in your Offer schema
+            { new: true }
+        );
+
+        if (!offer) {
+            return res.status(404).send('Offer not found');
+        }
+
+        // Redirect to offers list page or send a success message
+        res.redirect('/admin/offers'); // Adjust this to your needs
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+};
+const activateOffer = async (req, res) => {
+    try {
+        const { id } = req.params; // Get offer ID from URL parameters
+
+        // Find the offer and update its status
+        const offer = await Offer.findByIdAndUpdate(
+            id,
+            { isActive: true }, // Set isActive to true
+            { new: true }
+        );
+
+        if (!offer) {
+            return res.status(404).send('Offer not found');
+        }
+
+        // Redirect to offers list page or send a success message
+        res.redirect('/admin/offers'); // Adjust this to your needs
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+};
+
+
+const deleteOffer = async (req, res) => {
+    try {
+        const offerId = req.params.id;
+        await Offer.findByIdAndDelete(offerId); // Delete the offer by its ID
+
+        // Redirect or respond with a success message
+        
+        res.redirect('/admin/offers'); // Redirect back to the offers list
+    } catch (error) {
+        console.error(error);
+        req.flash('error_msg', 'Error deleting offer');
+        res.redirect('/admin/offers'); // Redirect back to the offers list on error
+    }
+};
+
+
+const  getCoupon = async (req,res)=>{
+
+    try {
+        res.render('admin/Coupon')
+    } catch (error){
+        console.log("get coupon broke")
+        
+    }
+}
 
 //export
 module.exports = {
@@ -675,7 +864,17 @@ module.exports = {
     getOrders,
     orderDetails,
     cancelOrder,
-    updateOrderStatus
+    updateOrderStatus,
+    returnOrder,
+    getOffer,
+    getAddOffer,
+    addOffer,
+    getEditOffer,
+    updateOffer,
+    deactivateOffer,
+    activateOffer,
+    deleteOffer,
+    getCoupon
     
 
 }

@@ -75,6 +75,7 @@ userRoute.get('/profile/orders',userAuth, userController.getUserOrders);
 
 // Cancel order
 userRoute.post('/cancel-order', userController.cancelOrder);
+userRoute.post('/return-order', userController.returnOrder);
 
 
 
@@ -110,6 +111,8 @@ userRoute.post('/checkout/address/edit/:id', userController.editAddressCheck);
 userRoute.post('/checkout/address/add', userController.addAddressCheck);
 userRoute.post('/checkout/address/delete/:id', userController.deleteAddressCheck);
 userRoute.post('/order',userController.postOrder)
+userRoute.post('/create-order', userController.createRazorpayOrder);
+userRoute.post('/verify-payment', userController.verifyPaymentAndSaveOrder);
 
 userRoute.delete('/cart/:productId', userController.deleteCartItem);
 userRoute.get('/success',userAuth,userController.getSuccess)
@@ -118,6 +121,16 @@ userRoute.get('/success',userAuth,userController.getSuccess)
 userRoute.get('/shop',userAuth,userController.getShop)
 userRoute.get('/load-items',userAuth,userController.loadShopItems)
 userRoute.get('/load-categories',userAuth, userController.shopCategoryItems);
+
+
+//routes for wishlist
+userRoute.get('/wishlist',userAuth,userController.loadWishlist);
+userRoute.post('/wishlist/add', userController.addProductToWishlist);
+userRoute.post('/wishlist/remove', userController.removeProductFromWishlist);
+
+
+
+
 
 
 

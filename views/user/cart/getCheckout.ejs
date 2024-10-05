@@ -104,14 +104,19 @@
             overflow-y: auto;
             /* Enable vertical scrolling if content exceeds max height */
         }
+
         .navbar-nav .dropdown-item:hover {
             background-color: #f8f9fa;
         }
+
         .navbar-nav .nav-link i {
-        font-size: 1.5rem; /* You can adjust this size */
+            font-size: 1.5rem;
+            /* You can adjust this size */
         }
+
         .navbar-nav .nav-item {
-        margin-right: 15px; /* Adjust this value for more or less space */
+            margin-right: 15px;
+            /* Adjust this value for more or less space */
         }
     </style>
 </head>
@@ -406,10 +411,19 @@
                 <!-- Payment Method Container -->
                 <div class="payment-methods mb-4 card p-4">
                     <h5>Select Payment Method</h5>
+
+                    <!-- Cash on Delivery Option -->
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="paymentMethod" id="cashOnDelivery"
                             value="cashOnDelivery" checked>
                         <label class="form-check-label" for="cashOnDelivery">Cash on Delivery</label>
+                    </div>
+
+                    <!-- Razorpay Option -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="razorpay"
+                            value="razorpay">
+                        <label class="form-check-label" for="razorpay">Online Payment (Razorpay)</label>
                     </div>
                 </div>
 
@@ -460,6 +474,10 @@
             <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+
+
 
 
             <script>
@@ -495,65 +513,127 @@
                 });
             </script>
             <script>
-               $('#placeOrderBtn').on('click', function () {
-    const orderProducts = [];
-    const checkoutCart = JSON.parse(localStorage.getItem('cart')) || {};
+                $('#placeOrderBtn').on('click', function () {
+                    const orderProducts = [];
+                    const checkoutCart = JSON.parse(localStorage.getItem('cart')) || {};
 
-    // Collect product IDs and quantities
-    $('.selected-quantity').each(function () {
-        const productId = $(this).data('product-id');
-        const selectedQuantity = checkoutCart[productId] || 1;
+                    // Collect product IDs and quantities
+                    $('.selected-quantity').each(function () {
+                        const productId = $(this).data('product-id');
+                        const selectedQuantity = checkoutCart[productId] || 1;
 
-        if (selectedQuantity > 0) {
-            orderProducts.push({
-                ProductId: productId,
-                Quantity: selectedQuantity,
-            });
-        }
-    });
+                        if (selectedQuantity > 0) {
+                            orderProducts.push({
+                                ProductId: productId,
+                                Quantity: selectedQuantity,
+                            });
+                        }
+                    });
 
-    // Get total price
-    const totalPrice = parseFloat($('#cart-total').text());
-    
-    // Get the selected shipping address ID from the radio buttons
-    const shippingAddress = $('input[name="selectedAddress"]:checked').val();
+                    // Get total price
+                    const totalPrice = parseFloat($('#cart-total').text());
 
-    // Check if an address is selected
-    if (!shippingAddress) {
-        alert('Please select a shipping address.');
-        return;
-    }
+                    // Get the selected shipping address ID from the radio buttons
+                    const shippingAddress = $('input[name="selectedAddress"]:checked').val();
 
-    // Create order object
-    const orderData = {
-        Products: orderProducts,
-        TotalPrice: totalPrice,
-        ShippingAddress: shippingAddress, // Now using the selected address ID
-        PaymentMethod: 'Cash on Delivery', // Since you only have one payment option
-    };
+                    // Check if an address is selected
+                    if (!shippingAddress) {
+                        alert('Please select a shipping address.');
+                        return;
+                    }
 
-    // Send order data to backend
-    $.ajax({
-        type: 'POST',
-        url: '/order', // Adjust the URL according to your route
-        data: JSON.stringify(orderData),
-        contentType: 'application/json',
-        success: function (response) {
-            // Handle success, e.g., show a success message or redirect
-            
-            window.location.href = `/success?orderId=${response.orderId}`; // Adjus
-            localStorage.removeItem('cart'); // Clear cart data from localStorage
-            // Redirect or update UI as needed
-        },
-        error: function (error) {
-            // Handle error, e.g., show an error message
-            alert('Failed to place order. Please try again.');
-        }
-    });
-});
+                    // Get the selected payment method (either 'cashOnDelivery' or 'razorpay')
+                    const selectedPaymentMethod = $('input[name="paymentMethod"]:checked').val();
 
+                    // Create order object
+                    const orderData = {
+                        Products: orderProducts,
+                        TotalPrice: totalPrice,
+                        ShippingAddress: shippingAddress,
+                        PaymentMethod: selectedPaymentMethod, // Dynamic based on user selection
+                    };
 
+                    // Handle 'Cash on Delivery' payment
+                    if (selectedPaymentMethod === 'cashOnDelivery') {
+                        // Proceed with the normal flow for Cash on Delivery
+                        $.ajax({
+                            type: 'POST',
+                            url: '/order', // Adjust the URL according to your route
+                            data: JSON.stringify(orderData),
+                            contentType: 'application/json',
+                            success: function (response) {
+                                // Handle success
+                                window.location.href = `/success?orderId=${response.orderId}`;
+                                localStorage.removeItem('cart'); // Clear cart data from localStorage
+                            },
+                            error: function (error) {
+                                // Handle error
+                                alert('Failed to place order. Please try again.');
+                            }
+                        });
+                    }
+
+                    // Handle Razorpay payment
+                    else if (selectedPaymentMethod === 'razorpay') {
+                        // Razorpay payment flow
+                        $.ajax({
+                            type: 'POST',
+                            url: '/create-order', // Backend route to create a Razorpay order
+                            data: JSON.stringify({ amount: totalPrice * 100 }), // Razorpay expects the amount in paise
+                            contentType: 'application/json',
+                            success: function (response) {
+                                const options = {
+                                    "key": "<%= RAZORPAY_KEY_ID %>", // Razorpay Key ID from server-side
+                                    "amount": response.amount, // Amount in paise
+                                    "currency": "INR",
+                                    "name": "DQ Mall",
+                                    "description": "Order Payment",
+                                    "image": "/users/images/logo2.png", // Optional: Your company logo
+                                    "order_id": response.id, // Razorpay order ID from server
+                                    "handler": function (paymentResponse) {
+                                        // After successful payment, save the order
+                                        orderData.PaymentMethod = 'razorpay';
+                                        orderData.PaymentDetails = paymentResponse; // Save payment details
+
+                                        // Send the updated order data to backend
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: '/order', // Same order route to save the order
+                                            data: JSON.stringify(orderData),
+                                            contentType: 'application/json',
+                                            success: function (orderResponse) {
+                                                window.location.href = `/success?orderId=${orderResponse.orderId}`;
+                                                localStorage.removeItem('cart'); // Clear cart after successful payment
+                                            },
+                                            error: function (error) {
+                                                alert('Failed to complete order after payment. Please contact support.');
+                                            }
+                                        });
+                                    },
+                                    "prefill": {
+                                        "name": "<%= user.Username %>", // Dynamic user name
+                                        "email": "<%= user.Email %>", // Dynamic user email
+                                        "contact": "<%= user.Mobile %>", // Dynamic user phone
+                                    },
+                                    "theme": {
+                                        "color": "#3399cc"
+                                    }
+                                };
+                                const rzp = new Razorpay(options);
+                                rzp.on('payment.failed', (req => {
+                                    console.log(req)
+                                }))
+                                rzp.open();
+                            },
+                            error: function (error) {
+                                alert('Failed to initiate online payment. Please try again.');
+                            }
+                        });
+                    }
+                });
             </script>
+
+
 
             <script>
 
@@ -620,7 +700,7 @@
                         closeEditAddressModal(index);
                     });
                 });
-                });
+
             </script>
 
 

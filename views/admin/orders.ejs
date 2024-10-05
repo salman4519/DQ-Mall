@@ -1,132 +1,6 @@
 <%- include('../layouts/header.ejs') %>
 
-  <div class="container-scroller">
-    <!-- partial:partials/_sidebar.html -->
-    <nav class="sidebar sidebar-offcanvas" id="sidebar">
-      <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
-        <!-- <h3>Kenza  Store</h3> -->
-      </div>
-      <ul class="nav">
-        <li class="nav-item profile">
-          <div class="profile-desc">
-            <div class="profile-pic">
-              <div class="count-indicator">
-                <img class="img-xs rounded-circle " src="/admin/assets/images/faces/face15.jpg" alt="">
-                <span class="count bg-success"></span>
-              </div>
-              <div class="profile-name">
-                <h5 class="mb-0 font-weight-normal">Henry Klein</h5>
-                <span>Gold Member</span>
-              </div>
-            </div>
-            <a href="#" id="profile-dropdown" data-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></a>
-            <div class="dropdown-menu dropdown-menu-right sidebar-dropdown preview-list"
-              aria-labelledby="profile-dropdown">
-              <a href="#" class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-dark rounded-circle">
-                    <i class="mdi mdi-settings text-primary"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <p class="preview-subject ellipsis mb-1 text-small">Account settings</p>
-                </div>
-              </a>
-              <div class="dropdown-divider"></div>
-              <a href="#" class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-dark rounded-circle">
-                    <i class="mdi mdi-onepassword  text-info"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <p class="preview-subject ellipsis mb-1 text-small">Change Password</p>
-                </div>
-              </a>
-              <div class="dropdown-divider"></div>
-              <a href="#" class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-dark rounded-circle">
-                    <i class="mdi mdi-calendar-today text-success"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <p class="preview-subject ellipsis mb-1 text-small">To-do list</p>
-                </div>
-              </a>
-            </div>
-          </div>
-        </li>
-        <li class="nav-item nav-category">
-          <span class="nav-link">Navigation</span>
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="/admin/dash">
-            <span class="menu-icon">
-              <i class="mdi mdi-speedometer"></i>
-            </span>
-            <span class="menu-title">Dashboard</span>
-          </a>
-        </li>
-        <li class="nav-item menu-items ">
-          <a class="nav-link" href="/admin/users">
-            <span class="menu-icon">
-              <i class="mdi mdi-laptop"></i>
-            </span>
-            <span class="menu-title">Users</span>
-          </a>
-
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="/admin/products">
-            <span class="menu-icon">
-              <i class="mdi mdi-playlist-play"></i>
-            </span>
-            <span class="menu-title">Products</span>
-          </a>
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="/admin/orders">
-            <span class="menu-icon">
-              <i class="mdi mdi-table-large"></i>
-            </span>
-            <span class="menu-title">Orders</span>
-          </a>
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
-            <span class="menu-icon">
-              <i class="mdi mdi-chart-bar"></i>
-            </span>
-            <span class="menu-title">Offers</span>
-          </a>
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
-            <span class="menu-icon">
-              <i class="mdi mdi-contacts"></i>
-            </span>
-            <span class="menu-title">Coupons</span>
-          </a>
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
-            <span class="menu-icon">
-              <i class="mdi mdi-security"></i>
-            </span>
-            <span class="menu-title">Deals</span>
-          </a>
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="/admin/Category">
-            <span class="menu-icon">
-              <i class="mdi mdi-file-document-box"></i>
-            </span>
-            <span class="menu-title">Category</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
+<%- include('../layouts/sidebar.ejs') %>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_navbar.html -->
@@ -384,34 +258,44 @@
                             </td>
                             <td>
                               <div class="d-flex align-items-center">
-                                <label
-                                  class="badge badge-<%= order.Status === 'Delivered' ? 'success' : order.Status === 'Pending' ? 'warning' : order.Status === 'Shipped' ? 'primary' : 'danger' %>">
-                                  <%= order.Status %>
-                                </label>
-                                <% if (order.Status !=='Cancelled' && order.Status !=='Delivered' ) { %>
-                                  <select class="form-control order-status-select ml-2"
-                                    data-order-id="<%= order.OrderId %>">
-                                    <option value="Pending" <%=order.Status==='Pending' ? 'selected' : '' %>>Pending
-                                    </option>
-                                    <option value="Shipped" <%=order.Status==='Shipped' ? 'selected' : '' %>>Shipped
-                                    </option>
-                                    <option value="Delivered" <%=order.Status==='Delivered' ? 'selected' : '' %>
-                                      >Delivered</option>
-
-                                  </select>
-                                  <% } %>
+                                  <!-- Display the status as a colored badge -->
+                                  <span class="badge badge-<%= order.Status === 'Returned' ? 'warning' : order.Status === 'Delivered' ? 'success' : order.Status === 'Pending' ? 'dark' : order.Status === 'Shipped' ? 'primary' : 'danger' %> status-label"
+                                        style="cursor: pointer;"
+                                        data-order-id="<%= order.OrderId %>">
+                                      <%= order.Status %>
+                                  </span>
+                                  
+                                  <!-- Dropdown options, hidden by default -->
+                                  <div id="dropdown-<%= order.OrderId %>" class="dropdown-options d-none">
+                                      <% if (order.Status === 'Pending') { %>
+                                          <select class="form-control order-status-select" data-order-id="<%= order.OrderId %>">
+                                              <option value="">Select Status</option>
+                                              <option value="Shipped">Shipped</option>
+                                              <option value="Delivered">Delivered</option>
+                                          </select>
+                                      <% } else if (order.Status === 'Shipped') { %>
+                                          <select class="form-control order-status-select" data-order-id="<%= order.OrderId %>">
+                                              <option value="">Select Status</option>
+                                              <option value="Delivered">Delivered</option>
+                                          </select>
+                                      <% } %>
+                                  </div>
                               </div>
-                            </td>
+                          </td>
                             <td>$<%= order.TotalPrice.toFixed(2) %>
                             </td>
                             <td>
                               <button class="btn btn-primary view-order-btn" data-order-id="<%= order.OrderId %>"
                                 data-toggle="modal" data-target="#orderModal">View</button>
 
-                              <% if (order.Status !=='Cancelled' && order.Status !=='Delivered' ) { %>
+                              <% if (order.Status !=='Cancelled' && order.Status !=='Delivered' && order.Status !=='Returned' ) { %>
                                 <button class="btn btn-danger cancel-order-btn"
                                   data-order-id="<%= order.OrderId %>">Cancel</button>
                                 <% } %>
+                                <% if ( order.Status =='Delivered' ) { %>
+                                  <button class="btn btn-warning return-order-btn"
+                                    data-order-id="<%= order.OrderId %>">Return</button>
+                                  <% } %>
                             </td>
                           </tr>
                           <% }) %>
@@ -476,6 +360,53 @@
           </div>
 
           <script>
+            document.querySelectorAll('.order-status-select').forEach(select => {
+                select.addEventListener('change', function () {
+                    const orderId = this.dataset.orderId;
+                    const newStatus = this.value;
+        
+                    // Check if a valid status is selected
+                    if (!newStatus) {
+                        alert('Please select a status.');
+                        return;
+                    }
+        
+                    // Make an API call to update the order status
+                    fetch('/admin/update-order-status', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ orderId: orderId, newStatus: newStatus }), // Send orderId and newStatus in the request body
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to update status: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        alert(data.message); // Display success message
+                        location.reload(); // Reload to show updated order status
+                    })
+                    .catch(error => {
+                        alert(`Error: ${error.message}`);
+                    });
+                });
+            });
+        
+            // Handle click on the status label to show/hide dropdown
+            document.querySelectorAll('.status-label').forEach(label => {
+                label.addEventListener('click', function () {
+                    const orderId = this.dataset.orderId;
+                    const dropdown = document.getElementById(`dropdown-${orderId}`);
+                    dropdown.classList.toggle('d-none');
+                });
+            });
+        </script>
+        
+        
+          <script>
             // Handle order cancellation
             document.querySelectorAll('.cancel-order-btn').forEach(button => {
               button.addEventListener('click', function () {
@@ -505,23 +436,22 @@
               });
             });
 
-            // Handle status change
-            document.querySelectorAll('.order-status-select').forEach(select => {
-              select.addEventListener('change', function () {
+            // Handle order cancellation
+            document.querySelectorAll('.return-order-btn').forEach(button => {
+              button.addEventListener('click', function () {
                 const orderId = this.dataset.orderId;
-                const newStatus = this.value;
 
-                // Make an API call to update the order status
-                fetch('/admin/update-order-status', { // Adjusted endpoint to match the controller
+                // Make an API call to cancel the order
+                fetch('/admin/return-order', { // Adjusted endpoint to match the controller
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
                   },
-                  body: JSON.stringify({ orderId: orderId, newStatus: newStatus }), // Send orderId and newStatus in the request body
+                  body: JSON.stringify({ orderId: orderId }), // Send orderId in the request body
                 })
                   .then(response => {
                     if (!response.ok) {
-                      throw new Error(`Failed to update status: ${response.statusText}`);
+                      throw new Error(`Failed to return order: ${response.statusText}`);
                     }
                     return response.json();
                   })
@@ -534,6 +464,9 @@
                   });
               });
             });
+
+            
+            
           </script>
 
           <script>
@@ -569,7 +502,7 @@
                     const orderDetailsHtml = `
             <p><strong>Order ID:</strong> ${order.OrderId}</p>
             <p><strong>Payment Method:</strong> ${order.PaymentMethod || 'N/A'}</p>
-            <p><strong>Status:</strong> <label class="badge badge-${order.Status === 'Delivered' ? 'success' : order.Status === 'Pending' ? 'warning' : order.Status === 'Shipped' ? 'primary' : 'danger'}">${order.Status}</label></p>
+            <p><strong>Status:</strong> <label class="badge badge-${order.Status === 'Returned' ? 'warning' :order.Status === 'Delivered' ? 'success' : order.Status === 'Pending' ? 'dark' : order.Status === 'Shipped' ? 'primary' : 'danger'}">${order.Status}</label></p>
             <p><strong>Total Price:</strong> $${totalPrice}</p>
             <h5>Products:</h5>
             <ul>

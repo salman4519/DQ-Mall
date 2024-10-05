@@ -60,7 +60,23 @@ adminRoute.post('/users/unblock/:userId',adminController.unblockUser)
 adminRoute.get('/orders',adminAuth,adminController.getOrders)
 adminRoute.get('/order-details/:orderId',adminAuth,adminController.orderDetails)
 adminRoute.post('/cancel-order',adminController.cancelOrder)
+adminRoute.post('/return-order',adminController.returnOrder)
 adminRoute.post('/update-order-status',adminController.updateOrderStatus)
+
+
+//route for offers
+adminRoute.get('/offers',adminAuth,adminController.getOffer);
+adminRoute.get('/offers/add',adminAuth,adminController.getAddOffer)
+adminRoute.get('/offers/edit/:offerId',adminAuth,adminController.getEditOffer)
+adminRoute.post('/offers/edit/:id', adminController.updateOffer);
+adminRoute.post('/offers/deactivate/:id', adminController.deactivateOffer);
+adminRoute.post('/offers/activate/:id', adminController.activateOffer);
+adminRoute.post('/add-offer', adminController.addOffer);
+adminRoute.post('/offers/delete/:id', adminController.deleteOffer);
+
+//route for coupon 
+adminRoute.get('/coupon',adminAuth,adminController.getCoupon)
+
 
 //route for logout 
 adminRoute.get('/logout',adminController.logout)
