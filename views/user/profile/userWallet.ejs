@@ -1,0 +1,21 @@
+<%- include("./profilePartial.ejs") %>
+
+<h2>Your Wallet Balance</h2>
+<div class="card">
+    <div class="card-header">
+        <h5>Current Balance</h5>
+    </div>
+    <div class="card-body">
+        <h3 id="wallet-balance" class="text-center">₹0.00</h3> <!-- Default balance set to ₹0.00 -->
+        <p class="text-muted text-center">This is the amount available in your wallet for future purchases or refunds.</p>
+        <hr>
+        <div class="text-center">
+            <button class="btn btn-primary" onclick="reloadBalance()">Refresh Balance</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+<%- include("./profileFooter.ejs") %>

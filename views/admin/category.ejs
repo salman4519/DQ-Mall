@@ -240,7 +240,7 @@
                         <td><%= category.name %></td>
                         <td>
                           <a href="/admin/categories/edit/<%= category._id %>" class="btn btn-outline-primary">Edit</a>
-                          <a href="/admin/categories/delete/<%= category._id %>" class="btn btn-outline-danger">Unlist</a>
+                          <a href="/admin/categories/delete/<%= category._id %>" class="btn btn-outline-danger unlist-btn">Unlist</a>
                         </td>
                       </tr>
                     <% }) %>
@@ -278,6 +278,37 @@
           </ul>
         </nav>
       </div>
+
+      <script>
+        document.querySelectorAll('.unlist-btn').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault(); // Prevent the default action (navigation)
+    
+                const unlistUrl = this.getAttribute('href'); // Get the URL from the href attribute
+    
+                // Show SweetAlert confirmation
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You want to unlist this product?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, unlist it!',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        popup: 'black-background'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Redirect to the unlist URL if confirmed
+                        window.location.href = unlistUrl;
+                    }
+                });
+            });
+        });
+    </script>
+    
       
 
 <%- include('../layouts/footer.ejs') %>

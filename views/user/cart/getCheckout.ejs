@@ -10,6 +10,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
+    <link rel="stylesheet" href="https://unpkg.com/sweetalert/dist/sweetalert.css">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
 
 
@@ -205,10 +210,10 @@
                                             </div>
                                             <button class="btn btn-dark" data-bs-toggle="modal"
                                                 data-bs-target="#editAddressModal<%= index %>">Edit</button>
-                                            <form action="/checkout/address/delete/<%= address._id %>" method="POST"
-                                                class="d-inline">
-                                                <button type="submit" class="btn btn-danger">Delete</button>
-                                            </form>
+                                                <form action="/checkout/address/delete/<%= address._id %>" method="POST" class="d-inline">
+                                                    <button type="button" class="btn btn-danger deleteAddressBtn" >Delete</button>
+                                                </form>
+                                                
                                         </div>
                                     </div>
                                 </div>
@@ -430,43 +435,103 @@
                 <!-- Product Details Container -->
                 <div class="product-details card mb-4 p-4">
                     <h5>Product Summary</h5>
-                    <% cart.Products.forEach((product)=> { %>
-                        <div class="card product-card mb-2">
-                            <div class="card-body d-flex">
-                                <img src="/uploads/<%= product.ProductId.Images[0] %>"
-                                    alt="<%= product.ProductId.Name %>" class="img-thumbnail me-3"
-                                    style="width: 100px; height: auto;">
-                                <div class="flex-grow-1">
-                                    <h5 class="card-title">
-                                        <%= product.ProductId.Name %>
-                                    </h5>
-                                    <p class="card-text product-price">$<span class="product-price">
-                                            <%= product.Price.toFixed(2) %>
-                                        </span>
-                                    </p>
-                                    <p class="card-text">Quantity: <span class="selected-quantity"
-                                            data-product-id="<%= product.ProductId._id %>">Loading...</span></p>
+                    <% let cartTotal=0; %> <!-- Initialize cart total -->
+                        <% cart.Products.forEach((product)=> { %>
+                            <div class="card product-card mb-2">
+                                <div class="card-body d-flex">
+                                    <img src="/uploads/<%= product.ProductId.Images[0] %>"
+                                        alt="<%= product.ProductId.Name %>" class="img-thumbnail me-3"
+                                        style="width: 100px; height: auto;">
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title">
+                                            <%= product.ProductId.Name %>
+                                        </h5>
+                                        <p class="mb-1">
+                                            Price: $
+                                            <span class="product-price">
+                                                <% // Check if there's a discounted price available for the product let
+                                                    productPrice=product.Price; const offer=offers.find(o=>
+                                                    o.productId && product.ProductId &&
+                                                    o.productId.equals(product.ProductId._id) && o.isActive
+                                                    );
+
+                                                    // If an offer exists, calculate the discounted price
+                                                    if (offer) {
+                                                    productPrice -= (productPrice * (offer.discountPercentage / 100));
+                                                    }
+                                                    // Display the appropriate prices based on the discount logic
+                                                    if (productPrice < product.Price) { %>
+                                                        <del>
+                                                            <%= product.DiscountedPrice %>
+                                                        </del>
+                                                        <span class="text-success">
+                                                            <%= product.DiscountedPrice.toFixed(2) %>
+                                                        </span>
+                                                        <% } else { %>
+                                                            <%= product.DiscountedPrice.toFixed(2) %>
+                                                                <% } %>
+                                            </span>
+                                        </p>
+                                        <p class="card-text">Quantity: <span class="selected-quantity"
+                                                data-product-id="<%= product.ProductId._id %>">Loading...</span></p>
+                                    </div>
                                 </div>
                             </div>
+                            <% }) %>
+                </div>
+            </div>
+
+        <!-- Right Side (Summary) -->
+<div class="right-side col-lg-4">
+    <h5>Order Summary</h5>
+    <div class="card p-4 mb-0">
+        <p>Total Price: $<span id="cart-total" data-original-price="<%= cartTotal.toFixed(2) %>"><%= cartTotal.toFixed(2) %></span></p>
+        <p>Shipping Charge: $<span id="shipping-charge">0.00</span></p>
+        <p>Discount Amount: $<span id="discount-amount">0.00</span></p> <!-- Added Discount Amount Display -->
+        <p><strong>Total Amount: $<span id="total-amount"><%= (cartTotal + 0).toFixed(2) %></span></strong></p>
+
+        <!-- Show Available Coupons Button -->
+        <button id="showCouponsBtn" class="btn btn-info w-100 mb-2">Show Available Coupons</button>
+
+        <!-- Available Coupons List -->
+        <div id="availableCoupons" class="mb-2" style="display:none;">
+            <ul class="list-group">
+                <% coupons.forEach(coupon => { %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong><%= coupon.couponCode %></strong> - 
+                            <%= coupon.discountPercentage %>% off 
+                            (min purchase: $<%= coupon.minPurchase %>) 
                         </div>
-                        <% }) %>
+                        <button class="btn btn-sm btn-outline-primary copyCouponBtn" data-coupon-code="<%= coupon.couponCode %>">Copy</button>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+
+        <div class="mb-2">
+            <input type="text" class="form-control" id="discountCodeInput" placeholder="Apply Discount Code">
+            <button class="btn btn-primary w-100 mt-2" id="applyDiscountBtn">Apply Code</button>
+            <button id="removeCouponBtn" class="btn btn-danger w-100 mt-2" style="display: none;">Remove Coupon</button>
+        </div>
+
+        <div id="appliedCoupon" class="mb-2" style="display:none;">
+            <p>Applied Coupon: <strong id="appliedCouponCode"></strong></p>
+        </div>
+    </div>
+
+    <a href="/cart" class="btn btn-warning w-100 mb-2">Update Cart</a>
+    <button id="placeOrderBtn" class="btn btn-success w-100">Place Order</button>
+</div>
+
+
+
+            <!-- Toast Notification -->
+            <div id="toast" class="toast" style="display: none;">
+                <div class="toast-body">
+                    <span id="toastMessage"></span>
                 </div>
             </div>
-
-            <!-- Right Side (Summary) -->
-            <div class="right-side col-lg-4">
-                <h5>Order Summary</h5>
-                <div class="card p-4 mb-0">
-                    <p>Total Price: $<span id="cart-total">0.00</span></p> <!-- Total price displayed here -->
-                    <div class="mb-2">
-                        <input type="text" class="form-control" placeholder="Apply Discount Code">
-                        <button class="btn btn-primary w-100 mt-2">Apply Code</button>
-                    </div>
-                    <a href="/cart" class="btn btn-warning w-100 mb-2">Update Cart</a>
-                    <button id="placeOrderBtn" class="btn btn-success w-100">Place Order</button>
-                </div>
-            </div>
-
 
 
             <!-- Include jQuery and Bootstrap -->
@@ -474,166 +539,347 @@
             <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-
-
-
 
             <script>
                 $(document).ready(function () {
+                    let appliedCoupon = null; // Variable to store the currently applied coupon
+            
+                    // Function to update total and shipping charge
+                    function updateTotal(discountedPrice, discountAmount) {
+                        const shippingCharge = discountedPrice >= 999 ? 0 : 50; // Free shipping for orders over 999
+                        const totalAmount = discountedPrice + shippingCharge;
+            
+                        $('#shipping-charge').text(shippingCharge.toFixed(2));
+                        $('#total-amount').text(totalAmount.toFixed(2));
+                        $('#discount-amount').text(discountAmount.toFixed(2)); // Update the discount amount display
+                    }
+            
+                    // Show toast notifications
+                    function showToast(message) {
+                        $('#toastMessage').text(message);
+                        $('.toast').toast({ delay: 3000 });
+                        $('.toast').toast('show');
+                    }
+            
+                    // Toggle the visibility of the available coupons
+                    $('#showCouponsBtn').on('click', function () {
+                        $('#availableCoupons').toggle();
+                    });
+            
+                    // Add event listener for the 'Apply Code' button
+                    $('#applyDiscountBtn').on('click', function () {
+                        const discountCode = $('#discountCodeInput').val().trim();
+                        const totalPrice = parseFloat($('#cart-total').data('original-price'));
+            
+                        if (!discountCode) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Invalid Code',
+                                text: 'Please enter a discount code.'
+                            });
+                            return;
+                        }
+            
+                        // Perform AJAX to validate and apply the discount code
+                        $.ajax({
+                            type: 'POST',
+                            url: '/apply-coupon',
+                            data: JSON.stringify({ couponCode: discountCode, cartTotal: totalPrice }),
+                            contentType: 'application/json',
+                            success: function (response) {
+                                console.log(response);
+            
+                                if (response.valid) {
+                                    if (appliedCoupon) {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Coupon Already Applied',
+                                            text: 'A coupon is already applied. Please remove it before applying a new one.'
+                                        });
+                                        return;
+                                    }
+            
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Coupon Applied!',
+                                        text: 'Discount: ' + response.discount + '%'
+                                    });
+            
+                                    // Update the total price with the discount
+                                    const maxDiscount = response.maxDiscount || 0;
+                                    const discountAmount = totalPrice * (response.discount / 100);
+                                    const applicableDiscount = Math.min(discountAmount, maxDiscount);
+                                    const discountedPrice = totalPrice - applicableDiscount;
+            
+                                    // Store discounted price in a variable or element for later use
+                                    $('#cart-total').text(discountedPrice.toFixed(2));
+                                    updateTotal(discountedPrice, applicableDiscount); // Pass both discounted price and discount amount to update totals
+            
+                                    // Set the applied coupon
+                                    appliedCoupon = discountCode;
+                                    $('#appliedCouponCode').text(appliedCoupon);
+                                    $('#appliedCoupon').show();
+                                    $('#removeCouponBtn').show();
+                                    $('#availableCoupons').hide();
+                                } else {
+                                    // Alert the user about minimum purchase requirement
+                                    if (response.message.includes('Minimum purchase amount')) {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Minimum Purchase Required',
+                                            text: response.message
+                                        });
+                                    } else {
+                                        showToast(response.message); // Show detailed error message
+                                    }
+                                }
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                console.error('Error applying coupon:', textStatus, errorThrown);
+                                showToast('Failed to apply the coupon. Please try again.');
+                            }
+                        });
+                    });
+            
+                    // Copy coupon code functionality
+                    $(document).on('click', '.copyCouponBtn', function () {
+                        const couponCode = $(this).data('coupon-code'); // Get the coupon code from data attribute
+            
+                        // Copy the coupon code to clipboard
+                        navigator.clipboard.writeText(couponCode).then(function () {
+                            // Show success alert
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Copied!',
+                                text: 'Coupon code "' + couponCode + '" copied to clipboard!'
+                            });
+                        }).catch(function (error) {
+                            console.error('Copy failed: ', error);
+                            showToast('Failed to copy coupon code. Please try again.');
+                        });
+                    });
+            
+                    // Event listener for removing the applied coupon
+                    $('#removeCouponBtn').on('click', function () {
+                        if (!appliedCoupon) {
+                            showToast('No coupon is currently applied.');
+                            return;
+                        }
+            
+                        const originalPrice = parseFloat($('#cart-total').data('original-price')); // Store the original price in data attribute
+                        $('#cart-total').text(originalPrice.toFixed(2)); // Reset total to original price
+                        $('#discount-amount').text('0.00'); // Reset discount to 0
+                        updateTotal(originalPrice, 0); // Update the totals again
+            
+                        // Show alert on successful removal of the coupon
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Coupon Removed!',
+                            text: 'Coupon "' + appliedCoupon + '" has been removed.'
+                        });
+            
+                        appliedCoupon = null; // Clear the applied coupon
+                        $('#appliedCouponCode').text(''); // Clear the displayed coupon
+                        $('#appliedCoupon').hide(); // Hide the applied coupon section
+                        $('#removeCouponBtn').hide(); // Hide remove button
+                        $('#availableCoupons').show(); // Show available coupons
+                    });
+            
                     // Retrieve the cart data from localStorage
                     const checkoutCart = JSON.parse(localStorage.getItem('cart')) || {};
-
                     let totalPrice = 0; // Initialize total price
-
+            
                     // Loop through each product in the Product Summary section and update the quantity and price
                     $('.selected-quantity').each(function () {
                         const productId = $(this).data('product-id'); // Get product ID from data attribute
-                        const selectedQuantity = checkoutCart[productId] || 1; // Get quantity from localStorage or default to 0
-
+                        const selectedQuantity = checkoutCart[productId] || 1; // Get quantity from LocalStorage or default to 1
+            
                         // Update the span with the correct quantity
                         $(this).text(selectedQuantity);
-
+            
                         // Get the price of the product from the closest .product-card element
                         const priceText = $(this).closest('.product-card').find('.product-price').text();
-
+            
                         // Clean the price string and convert to float
                         const price = parseFloat(priceText.replace(/[^0-9.-]+/g, "")); // Removes $ and other non-numeric characters
-
+            
                         // Check if price is valid
                         if (!isNaN(price)) {
                             // Calculate total for the current product and add to totalPrice
                             totalPrice += price * selectedQuantity;
                         }
                     });
-
-                    // Update total price in the #cart-total element
-                    $('#cart-total').text(totalPrice.toFixed(2));
-                });
-            </script>
-            <script>
-                $('#placeOrderBtn').on('click', function () {
-                    const orderProducts = [];
-                    const checkoutCart = JSON.parse(localStorage.getItem('cart')) || {};
-
-                    // Collect product IDs and quantities
-                    $('.selected-quantity').each(function () {
-                        const productId = $(this).data('product-id');
-                        const selectedQuantity = checkoutCart[productId] || 1;
-
-                        if (selectedQuantity > 0) {
-                            orderProducts.push({
-                                ProductId: productId,
-                                Quantity: selectedQuantity,
+            
+                    // Set the original total price and update the display
+                    $('#cart-total').data('original-price', totalPrice); // Store original price for reference
+                    $('#cart-total').text(totalPrice.toFixed(2)); // Set the initial total price
+                    updateTotal(totalPrice, 0); // Update the total display with 0 discount initially
+            
+                    // Place Order Button Click Handler
+                    $('#placeOrderBtn').on('click', function () {
+                        const orderProducts = [];
+                        const checkoutCart = JSON.parse(localStorage.getItem('cart')) || {};
+            
+                        // Collect product IDs and quantities
+                        $('.selected-quantity').each(function () {
+                            const productId = $(this).data('product-id');
+                            const selectedQuantity = checkoutCart[productId] || 1;
+            
+                            if (selectedQuantity > 0) {
+                                orderProducts.push({
+                                    ProductId: productId,
+                                    Quantity: selectedQuantity,
+                                });
+                            }
+                        });
+            
+                        // Get total price
+                        const totalPrice = parseFloat($('#cart-total').text()); // Get original price for the order
+                        const discountedPrice = parseFloat($('#discount-amount').text()); // Get the discounted price from the display
+            
+                        // Get the selected shipping address ID from the radio buttons
+                        const shippingAddress = $('input[name="selectedAddress"]:checked').val();
+            
+                        // Check if an address is selected
+                        if (!shippingAddress) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Select Address',
+                                text: 'Please select a shipping address.',
+                            });
+                            return;
+                        }
+            
+                        // Get the selected payment method (either 'cashOnDelivery' or 'razorpay')
+                        const selectedPaymentMethod = $('input[name="paymentMethod"]:checked').val();
+            
+                        // Create order object
+                        const orderData = {
+                            Products: orderProducts,
+                            TotalPrice: totalPrice, // Use the original total price
+                            DiscountedPrice: discountedPrice, // Add the discounted price here
+                            ShippingAddress: shippingAddress,
+                            PaymentMethod: selectedPaymentMethod, // Dynamic based on user selection
+                        };
+            
+                        // Handle 'Cash on Delivery' payment
+                        if (selectedPaymentMethod === 'cashOnDelivery') {
+                            // Proceed with the normal flow for Cash on Delivery
+                            $.ajax({
+                                type: 'POST',
+                                url: '/order', // Adjust the URL according to your route
+                                data: JSON.stringify(orderData),
+                                contentType: 'application/json',
+                                success: function (response) {
+                                    // Redirect without showing SweetAlert confirmation
+                                    window.location.href = `/success?orderId=${response.orderId}`;
+                                    localStorage.removeItem('cart'); // Clear cart data from localStorage
+                                },
+                                error: function (error) {
+                                    // Handle error
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Order Failed',
+                                        text: 'Failed to place order. Please try again.',
+                                    });
+                                }
+                            });
+                        }
+            
+                        // Handle Razorpay payment
+                        else if (selectedPaymentMethod === 'razorpay') {
+                            // Razorpay payment flow
+                            const amountInPaise = Math.round(totalPrice * 100); // Use the discounted price for Razorpay amount
+            
+                            $.ajax({
+                                type: 'POST',
+                                url: '/create-order', // Backend route to create a Razorpay order
+                                data: JSON.stringify({ amount: amountInPaise }), // Razorpay expects the amount in paise
+                                contentType: 'application/json',
+                                success: function (response) {
+                                    const options = {
+                                        "key": "<%= RAZORPAY_KEY_ID %>", // Razorpay Key ID from server-side
+                                        "amount": response.amount, // Amount in paise
+                                        "currency": "INR",
+                                        "name": "DQ Mall",
+                                        "description": "Purchase Description",
+                                        "image": "https://example.com/your-logo.jpg", // Optional logo
+                                        "order_id": response.orderId, // Get the order ID from the response
+                                        "handler": function (paymentResponse) {
+                                            // Handle successful payment
+                                            const paymentData = {
+                                                paymentId: paymentResponse.razorpay_payment_id,
+                                                orderId: response.orderId,
+                                            };
+            
+                                            // Proceed to place order
+                                            $.ajax({
+                                                type: 'POST',
+                                                url: '/order', // Adjust the URL according to your route
+                                                data: JSON.stringify(orderData), // Send the order details
+                                                contentType: 'application/json',
+                                                success: function (orderResponse) {
+                                                    // Redirect without showing SweetAlert confirmation
+                                                    window.location.href = `/success?orderId=${orderResponse.orderId}`;
+                                                    localStorage.removeItem('cart'); // Clear cart data from localStorage
+                                                },
+                                                error: function (error) {
+                                                    // Handle error
+                                                    Swal.fire({
+                                                        icon: 'error',
+                                                        title: 'Order Failed',
+                                                        text: 'Failed to place order. Please try again.',
+                                                    });
+                                                }
+                                            });
+                                        },
+                                        "theme": {
+                                            "color": "#F37254"
+                                        }
+                                    };
+            
+                                    const rzp1 = new Razorpay(options);
+                                    rzp1.open(); // Open the Razorpay payment dialog
+                                },
+                                error: function (error) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Razorpay Order Failed',
+                                        text: 'Failed to create Razorpay order. Please try again.',
+                                    });
+                                }
                             });
                         }
                     });
-
-                    // Get total price
-                    const totalPrice = parseFloat($('#cart-total').text());
-
-                    // Get the selected shipping address ID from the radio buttons
-                    const shippingAddress = $('input[name="selectedAddress"]:checked').val();
-
-                    // Check if an address is selected
-                    if (!shippingAddress) {
-                        alert('Please select a shipping address.');
-                        return;
-                    }
-
-                    // Get the selected payment method (either 'cashOnDelivery' or 'razorpay')
-                    const selectedPaymentMethod = $('input[name="paymentMethod"]:checked').val();
-
-                    // Create order object
-                    const orderData = {
-                        Products: orderProducts,
-                        TotalPrice: totalPrice,
-                        ShippingAddress: shippingAddress,
-                        PaymentMethod: selectedPaymentMethod, // Dynamic based on user selection
-                    };
-
-                    // Handle 'Cash on Delivery' payment
-                    if (selectedPaymentMethod === 'cashOnDelivery') {
-                        // Proceed with the normal flow for Cash on Delivery
-                        $.ajax({
-                            type: 'POST',
-                            url: '/order', // Adjust the URL according to your route
-                            data: JSON.stringify(orderData),
-                            contentType: 'application/json',
-                            success: function (response) {
-                                // Handle success
-                                window.location.href = `/success?orderId=${response.orderId}`;
-                                localStorage.removeItem('cart'); // Clear cart data from localStorage
-                            },
-                            error: function (error) {
-                                // Handle error
-                                alert('Failed to place order. Please try again.');
-                            }
-                        });
-                    }
-
-                    // Handle Razorpay payment
-                    else if (selectedPaymentMethod === 'razorpay') {
-                        // Razorpay payment flow
-                        $.ajax({
-                            type: 'POST',
-                            url: '/create-order', // Backend route to create a Razorpay order
-                            data: JSON.stringify({ amount: totalPrice * 100 }), // Razorpay expects the amount in paise
-                            contentType: 'application/json',
-                            success: function (response) {
-                                const options = {
-                                    "key": "<%= RAZORPAY_KEY_ID %>", // Razorpay Key ID from server-side
-                                    "amount": response.amount, // Amount in paise
-                                    "currency": "INR",
-                                    "name": "DQ Mall",
-                                    "description": "Order Payment",
-                                    "image": "/users/images/logo2.png", // Optional: Your company logo
-                                    "order_id": response.id, // Razorpay order ID from server
-                                    "handler": function (paymentResponse) {
-                                        // After successful payment, save the order
-                                        orderData.PaymentMethod = 'razorpay';
-                                        orderData.PaymentDetails = paymentResponse; // Save payment details
-
-                                        // Send the updated order data to backend
-                                        $.ajax({
-                                            type: 'POST',
-                                            url: '/order', // Same order route to save the order
-                                            data: JSON.stringify(orderData),
-                                            contentType: 'application/json',
-                                            success: function (orderResponse) {
-                                                window.location.href = `/success?orderId=${orderResponse.orderId}`;
-                                                localStorage.removeItem('cart'); // Clear cart after successful payment
-                                            },
-                                            error: function (error) {
-                                                alert('Failed to complete order after payment. Please contact support.');
-                                            }
-                                        });
-                                    },
-                                    "prefill": {
-                                        "name": "<%= user.Username %>", // Dynamic user name
-                                        "email": "<%= user.Email %>", // Dynamic user email
-                                        "contact": "<%= user.Mobile %>", // Dynamic user phone
-                                    },
-                                    "theme": {
-                                        "color": "#3399cc"
-                                    }
-                                };
-                                const rzp = new Razorpay(options);
-                                rzp.on('payment.failed', (req => {
-                                    console.log(req)
-                                }))
-                                rzp.open();
-                            },
-                            error: function (error) {
-                                alert('Failed to initiate online payment. Please try again.');
-                            }
-                        });
-                    }
                 });
             </script>
-
-
+            <script>
+                $(document).ready(function () {
+                    $('.deleteAddressBtn').on('click', function (e) {
+                        e.preventDefault(); // Prevent the form from submitting immediately
+            
+                        const form = $(this).closest('form'); // Get the closest form element
+            
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "This will permanently delete the address!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit(); // Submit the form if confirmed
+                            }
+                        });
+                    });
+                });
+            </script>
+            
+            
+            
+            
 
             <script>
 

@@ -7,6 +7,9 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+
     <style>
         /* Navigation & Breadcrumb Styles */
         .breadcrumb-item a {
@@ -148,31 +151,31 @@
                             <img src="/uploads/<%= product.Images[0] %>" class="card-img-top" alt="<%= product.Name %>" onclick="quickView('<%= product._id %>')">
                             <div class="card-body text-center">
                                 <h5 class="card-title"><%= product.Name %></h5>
-                
+    
                                 <% 
                                     let hasOffer = false;
                                     let discountedPrice = product.Price; // Start with the original price
-                                    let applicableOffer = null;
-                
+                                    
                                     // Check for applicable offers for this product
-                                    if (Array.isArray(applicableOffers)) {
-                                        applicableOffers.forEach(currentOffer => {
-                                            if (currentOffer.applicableTo === 'product' && currentOffer.productIds.includes(product._id)) {
-                                                hasOffer = true; // Offer applies to this product
-                                                discountedPrice = product.Price - (product.Price * (currentOffer.discountPercentage / 100));
-                                                applicableOffer = currentOffer; // Store the current offer
-                                            }
-                                        });
-                                    }
+                                    applicableOffers.forEach(currentOffer => {
+                                        if (currentOffer.applicableTo === 'product' && currentOffer.productIds.includes(product._id)) {
+                                            hasOffer = true; // Offer applies to this product
+                                            discountedPrice = product.Price - (product.Price * (currentOffer.discountPercentage / 100));
+                                        } else if (currentOffer.applicableTo === 'category' && currentOffer.categoryIds.includes(product.CategoryId._id)) {
+                                            // Check if there's a category offer
+                                            hasOffer = true; // Offer applies to the product's category
+                                            discountedPrice = product.Price - (product.Price * (currentOffer.discountPercentage / 100));
+                                        }
+                                    });
                                 %>
-                
+    
                                 <% if (hasOffer) { %>
                                     <span style="text-decoration: line-through;">$<%= product.Price.toFixed(2) %></span>
                                     <strong class="text-success">  $<%= discountedPrice.toFixed(2) %> </strong>
                                 <% } else { %>
                                     $<%= product.Price.toFixed(2) %>
                                 <% } %>
-                
+    
                                 <% if (product.Quantity === 0) { %>
                                     <p class="text-danger"><strong>Out of Stock</strong></p>
                                     <button class="btn btn-primary addToCartBtn" style="display: none;" disabled>Add to Cart</button>
@@ -180,19 +183,24 @@
                                     <p><strong>Quantity:</strong> <%= product.Quantity %></p>
                                     <button class="btn btn-primary addToCartBtn" data-product-id="<%= product._id %>" data-price="<%= product.Price %>">Add to Cart</button>
                                 <% } %>
-                
+    
                                 <!-- Wishlist Button -->
-                                <button id="addToWishlistBtn" class="btn btn-dark mt-2" data-product-id="<%= product._id %>">
+                                <button  class="btn btn-dark mt-2 addToWishlistBtn" data-product-id="<%= product._id %>">
                                     <i class="bi bi-heart"></i> 
                                 </button>
                             </div>
                         </div>
                     </div>
                 <% }) %>
-                
-                <% } %>
-                
-    
+            <% } else { %>
+                <div class="col-12">
+                    <div class="alert alert-warning text-center" role="alert">
+                        No products available in this category.
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
     
 
         <!-- Pagination Controls -->
@@ -248,39 +256,37 @@
                     contentType: 'application/json',
                     data: JSON.stringify({ productId, price, quantity }),
                     success: function(response) {
-                        alert('Product added to cart!');
+                        swal("Success!", "Product added to cart!", "success");
                     },
                     error: function(error) {
                         console.error('Error adding to cart:', error);
-                        alert('Failed to add product to cart. Please try again.');
+                        swal("Error!", "Failed to add product to cart. Please try again.", "error");
                     }
                 });
             });
-
-            
-            });
-       
+        });
     </script>
+    
     <script>
         $(document).ready(function() {
-    $('#addToWishlistBtn').on('click', function() {
-        const productId = $(this).data('product-id');
-        
-        $.ajax({
-            url: '/wishlist/add', // Server endpoint to handle adding product to wishlist
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ ProductId: productId }), // Match the key with your backend
-            success: function(response) {
-                alert('Product added to wishlist!');
-            },
-            error: function(error) {
-                console.error('Error adding to wishlist:', error);
-                alert('Failed to add product to wishlist. Please try again.');
-            }
+            $('.addToWishlistBtn').on('click', function() {
+                const productId = $(this).data('product-id');
+    
+                $.ajax({
+                    url: '/wishlist/add', // Server endpoint to handle adding product to wishlist
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ ProductId: productId }), // Match the key with your backend
+                    success: function(response) {
+                        swal("Success!", "Product added to wishlist!", "success");
+                    },
+                    error: function(error) {
+                        console.error('Error adding to wishlist:', error);
+                        swal("Error!", "Failed to add product to wishlist. Please try again.", "error");
+                    }
+                });
+            });
         });
-    });
-});
     </script>
 </body>
 </html>

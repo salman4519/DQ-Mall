@@ -7,6 +7,8 @@
     <title>Shop Page</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/sweetalert/dist/sweetalert.css">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
     <style>
         .card {
@@ -221,57 +223,62 @@
             }
 
             // Fetch products from the server
-            function fetchProducts(queryParams = {}) {
-                let queryString = new URLSearchParams(queryParams).toString();
+function fetchProducts(queryParams = {}) {
+    let queryString = new URLSearchParams(queryParams).toString();
 
-                fetch(`/load-items?${queryString}`) // Your API endpoint with dynamic query string
-                    .then(response => response.json())
-                    .then(products => {
-                        displayProducts(products);
-                    })
-                    .catch(error => console.error('Error fetching products:', error));
+    fetch(`/load-items?${queryString}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(products => {
+            console.log("Fetched products:", products); // Log fetched products
+            displayProducts(products);
+        })
+        .catch(error => console.error('Error fetching products:', error));
+}
+
+
+// Display products in the grid
+function displayProducts(products) {
+    productGrid.innerHTML = ''; // Clear existing products
+
+    if (products.length > 0) {
+        products.forEach(product => {
+            const productCol = document.createElement('div');
+            productCol.className = 'col-sm-6 col-md-4 col-lg-3 mb-4'; // Adjust based on number of products in a row
+
+            // Check if the product quantity is 0
+            const outOfStock = product.Quantity === 0; // Assuming 'Quantity' is the field in your product model
+
+            // Get applicable offers for this product
+            const offers = product.applicableOffers || []; 
+            console.log("The offers for product", product.Name, "are", offers);
+
+            // Calculate discounted price if there are offers
+            let discountedPrice = product.Price; // Original price
+            if (offers.length > 0) {
+                // Find the best applicable offer
+                const activeOffer = offers.find(offer =>
+                    offer.isActive &&
+                    new Date() >= new Date(offer.startTime) &&
+                    new Date() <= new Date(offer.endTime)
+                );
+
+                console.log("Active offer found:", activeOffer); // Log the active offer
+
+                // Calculate discounted price if there is an active offer
+                if (activeOffer) {
+                    discountedPrice = product.Price * (1 - activeOffer.discountPercentage / 100);
+                    console.log(`Discounted price calculated: $${discountedPrice.toFixed(2)}`); // Log discounted price
+                } else {
+                    console.log("No active offer available.");
+                }
             }
 
-            // Display products in the grid
-
-            // Display products in the grid
-            function displayProducts(products) {
-                productGrid.innerHTML = ''; // Clear existing products
-
-                if (products.length > 0) {
-                    products.forEach(product => {
-                        const productCol = document.createElement('div');
-                        productCol.className = 'col-sm-6 col-md-4 col-lg-3 mb-4'; // Adjust based on number of products in a row
-
-                        // Check if the product quantity is 0
-                        const outOfStock = product.Quantity === 0; // Assuming 'Quantity' is the field in your product model
-
-                        // Check for applicable offers
-                        const offers = product.applicableOffers || []; // Get applicable offers for this product
-                        console.log("The offers for product", product.Name, "are", offers);
-
-                        // Calculate discounted price if there are offers
-                        let discountedPrice = product.Price; // Original price
-                        if (offers.length > 0) {
-                            // Find the best applicable offer
-                            const activeOffer = offers.find(offer =>
-                                offer.isActive &&
-                                new Date() >= new Date(offer.startTime) &&
-                                new Date() <= new Date(offer.endTime)
-                            );
-
-                            console.log("Active offer found:", activeOffer); // Log the active offer
-
-                            // Calculate discounted price if there is an active offer
-                            if (activeOffer) {
-                                discountedPrice = product.Price * (1 - activeOffer.discountPercentage / 100);
-                                console.log(`Discounted price calculated: $${discountedPrice.toFixed(2)}`); // Log discounted price
-                            } else {
-                                console.log("No active offer available.");
-                            }
-                        }
-
-                        productCol.innerHTML = `
+            productCol.innerHTML = `
                 <div class="card shadow-sm border-0">
                     <a href="/product/${product._id}">
                         <img src="/uploads/${product.Images[0]}" class="card-img-top" alt="${product.Name}">
@@ -287,16 +294,14 @@
 
                         <!-- Conditionally render button or out of stock message -->
                         ${outOfStock
-                                ? '<span class="text-danger">Out of Stock</span>'
-                                : `<button class="btn btn-primary add-to-cart-btn" 
-    data-product-id="${product._id}" 
-    data-price="${discountedPrice.toFixed(2)}" 
-    data-discounted-price="${discountedPrice.toFixed(2)}">
-    Add to Cart
-</button>
+                            ? '<span class="text-danger">Out of Stock</span>'
+                            : `<button class="btn btn-primary add-to-cart-btn" 
+                                data-product-id="${product._id}" 
+                                data-price="${discountedPrice.toFixed(2)}" 
+                                data-discounted-price="${discountedPrice.toFixed(2)}">
+                                Add to Cart
+                            </button>`}
 
-`}
-                        
                         <!-- Add to Wishlist Button -->
                         <button class="btn btn-outline-secondary add-to-wishlist-btn" data-product-id="${product._id}">
                             <i class="bi bi-heart"></i>
@@ -304,77 +309,81 @@
                     </div>
                 </div>
             `;
-                        productGrid.appendChild(productCol);
-                    });
+            productGrid.appendChild(productCol);
+        });
 
-                    // Attach event listeners to the buttons after products are rendered
-                    attachButtonListeners();
-                } else {
-                    productGrid.innerHTML = `<p class="text-center">No products found.</p>`;
-                }
-            }
-
-
+        // Attach event listeners to the buttons after products are rendered
+        attachButtonListeners();
+    } else {
+        productGrid.innerHTML = `<p class="text-center">No products found.</p>`;
+    }
+}
 
 
 
 
-            function attachButtonListeners() {
-                // Add to Cart Button
-                document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-    button.addEventListener('click', function () {
-        const productId = this.getAttribute('data-product-id');
-        
-        // Retrieve the discounted price
-        const discountedPrice = parseFloat(this.getAttribute('data-discounted-price')) || parseFloat(this.getAttribute('data-price'));
-        
-        const quantity = 1; // Default quantity
-        
-        // Send AJAX request to add to cart
-        fetch('/cart/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ productId, price: discountedPrice, quantity })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.message) {
-                    alert('Product added to cart!');
-                } else {
-                    alert(data.message);
-                }
+
+
+function attachButtonListeners() {
+    // Add to Cart Button
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const productId = this.getAttribute('data-product-id');
+            const discountedPrice = parseFloat(this.getAttribute('data-discounted-price')) || parseFloat(this.getAttribute('data-price'));
+            const quantity = 1; // Default quantity
+            
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ productId, price: discountedPrice, quantity })
             })
-            .catch(error => console.error('Error adding to cart:', error));
-    });
-});
-
-                // Add to Wishlist Button
-                document.querySelectorAll('.add-to-wishlist-btn').forEach(button => {
-                    button.addEventListener('click', function () {
-                        const productId = this.getAttribute('data-product-id');
-
-                        // Send AJAX request to add to wishlist
-                        fetch('/wishlist/add', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ ProductId: productId })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.message) {
-                                    alert(data.message);
-                                } else {
-                                    alert('Product added to wishlist!');
-                                }
-                            })
-                            .catch(error => console.error('Error adding to wishlist:', error));
-                    });
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.message) {
+                        swal("Success!", "Product added to cart!", "success");
+                    } else {
+                        swal("Error!", data.message, "error");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding to cart:', error);
+                    swal("Error!", 'An error occurred while adding the product to the cart.', "error");
                 });
-            }
+        });
+    });
+
+    // Add to Wishlist Button
+    document.querySelectorAll('.add-to-wishlist-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const productId = this.getAttribute('data-product-id');
+
+            // Send AJAX request to add to wishlist
+            fetch('/wishlist/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ProductId: productId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Wishlist response:", data); // Log the response data for debugging
+                    if (data.success) { // Adjust according to your API response structure
+                        swal("Success!", "Product added to wishlist!", "success");
+                    } else {
+                        swal("Success!", "Product added to wishlist!", "success");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding to wishlist:', error);
+                    swal("Error!", 'An error occurred while adding the product to the wishlist.', "error");
+                });
+        });
+    });
+}
+
 
 
 

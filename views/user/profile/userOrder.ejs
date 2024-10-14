@@ -76,30 +76,46 @@
     document.querySelectorAll('.cancel-order-btn').forEach(button => {
         button.addEventListener('click', function () {
             const orderId = this.dataset.orderId;
-            const confirmation = confirm('Are you sure you want to cancel this order?');
 
-            if (confirmation) {
-                // Send request to cancel order
-                fetch('/cancel-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ orderId: orderId }),
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Order canceled successfully.');
-                        location.reload(); // Refresh the page to show updated order status
-                    } else {
-                        alert('Failed to cancel order. Please try again.');
+            swal({
+                title: "Are you sure?",
+                text: "Do you really want to cancel this order? ",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancel",
+                    confirm: {
+                        text: "Yes, cancel it!",
+                        value: true,
+                        className: "btn-danger"
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while canceling the order.');
-                });
-            }
+                },
+                dangerMode: true,
+            }).then((willCancel) => {
+                if (willCancel) {
+                    // Send request to cancel order
+                    fetch('/cancel-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ orderId: orderId }),
+                    })
+                    .then(response => response.json()) // Parse the JSON response
+                    .then(data => {
+                        if (data.success) {
+                            swal("Success!", data.message, "success").then(() => {
+                                location.reload(); // Refresh the page to show updated order status
+                            });
+                        } else {
+                            swal("Error!", data.message || 'Failed to cancel order. Please try again.', "error");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        swal("Error!", 'An error occurred while canceling the order.', "error");
+                    });
+                }
+            });
         });
     });
 
@@ -107,30 +123,47 @@
     document.querySelectorAll('.return-order-btn').forEach(button => {
         button.addEventListener('click', function () {
             const orderId = this.dataset.orderId;
-            const confirmation = confirm('Are you sure you want to return this order?');
 
-            if (confirmation) {
-                // Send request to return order
-                fetch('/return-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ orderId: orderId }),
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Order returned successfully.');
-                        location.reload(); // Refresh the page to show updated order status
-                    } else {
-                        alert('Failed to return order. Please try again.');
+            swal({
+                title: "Are you sure?",
+                text: "Do you really want to return this order? ",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancel",
+                    confirm: {
+                        text: "Yes, return it!",
+                        value: true,
+                        className: "btn-danger"
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while returning the order.');
-                });
-            }
+                },
+                dangerMode: true,
+            }).then((willReturn) => {
+                if (willReturn) {
+                    // Send request to return order
+                    fetch('/return-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ orderId: orderId }),
+                    })
+                    .then(response => response.json()) // Parse the JSON response
+                    .then(data => {
+                        if (data.success) {
+                            swal("Success!", data.message, "success").then(() => {
+                                location.reload(); // Refresh the page to show updated order status
+                            });
+                        } else {
+                            swal("Error!", data.message || 'Failed to return order. Please try again.', "error");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        swal("Error!", 'An error occurred while returning the order.', "error");
+                    });
+                }
+            });
         });
     });
 </script>
+

@@ -1,15 +1,32 @@
 const mongoose = require('mongoose');
 
 const couponSchema = new mongoose.Schema({
-  code: { type: String, required: true, unique: true },
-  discountType: { type: String, enum: ['fixed', 'percentage'], required: true },
-  discountValue: { type: Number, required: true },
-  minOrderValue: { type: Number, default: 0 }, // minimum order value to apply the coupon
-  startDate: { type: Date, required: true },
-  expirationDate: { type: Date, required: true },
-  usageLimit: { type: Number, default: 1 }, // how many times the coupon can be used
-  usedCount: { type: Number, default: 0 },
-  isActive: { type: Boolean, default: true },
-});
+  couponCode: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  discountPercentage: {
+    type: Number,
+    required: true
+  },
+  maxDiscountAmount: {
+    type: Number,
+    required: true // This field ensures that the maximum discount amount is specified
+  },
+  expiryDate: {
+    type: Date,
+    required: true
+  },
+  minPurchase: {
+    type: Number,
+    required: true
+  },
+  isActive: {
+    type: Boolean,
+    default: true // Automatically set to true when a new coupon is added
+  }
+}, { timestamps: true });
 
 const Coupon = mongoose.model('Coupon', couponSchema);
+module.exports = Coupon;

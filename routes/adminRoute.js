@@ -76,6 +76,16 @@ adminRoute.post('/offers/delete/:id', adminController.deleteOffer);
 
 //route for coupon 
 adminRoute.get('/coupon',adminAuth,adminController.getCoupon)
+adminRoute.get('/coupon/add',adminAuth,adminController.addCoupon)
+adminRoute.post('/coupon/add',adminAuth,adminController.postAddCoupon)
+adminRoute.post('/coupons/activate/:id', adminController.activateCoupon);
+adminRoute.post('/coupons/deactivate/:id', adminController.deactivateCoupon);
+adminRoute.post('/coupons/delete/:id', adminController.deleteCoupon);
+adminRoute.post('/coupons/update/:id', adminController.updateCoupon);
+adminRoute.get('/coupons/edit/:id',adminAuth, adminController.getEditCoupon);
+
+adminRoute.post('/download-sales-report', adminController.generateSalesReportPDF);
+adminRoute.post('/download-sales-report-excel', adminController.generateSalesReportExcel);
 
 
 //route for logout 

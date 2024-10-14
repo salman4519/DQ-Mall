@@ -21,7 +21,7 @@
                             </p>
                             <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#editAddressModal<%= index %>">Edit</button>
                             <form action="/profile/address/delete/<%= address._id %>" method="POST" class="d-inline">
-                                <button type="submit" class="btn btn-danger">Delete</button>
+                                <button type="submit" class="btn btn-danger" onclick="confirmDelete(event);">Delete</button>
                             </form>
                         </div>
                     </div>
@@ -180,10 +180,11 @@
                 })
                 .then(data => {
                     if (data[0].Status === "Success") {
+                        // Set the address fields based on mode (new or existing)
                         if (mode === 'new') {
-                            document.getElementById('City').value = data[0].PostOffice[0].District; // Fetching District from API
+                            document.getElementById('City').value = data[0].PostOffice[0].District; // Fetching District
                             document.getElementById('District').value = data[0].PostOffice[0].District;
-                            document.getElementById('State').value = data[0].PostOffice[0].State; // Fetching State from API
+                            document.getElementById('State').value = data[0].PostOffice[0].State; // Fetching State
                             document.getElementById('Country').value = "India"; // Hardcoded as India
                         } else {
                             const index = parseInt(mode);
@@ -193,15 +194,48 @@
                             document.getElementById(`Country${index}`).value = "India"; // Hardcoded as India
                         }
                     } else {
-                        alert('Could not fetch address data. Please check the postal code and try again.');
+                        swal("Error", 'Could not fetch address data. Please check the postal code and try again.', "error");
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching address:', error);
-                    alert('Could not fetch address data. Please check the postal code and try again.');
+                    swal("Error", 'Could not fetch address data. Please check the postal code and try again.', "error");
                 });
         }
+    
+        // Function to confirm address deletion with SweetAlert
+        function confirmDelete(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const form = event.target.closest('form'); // Get the closest form element
+
+        swal({
+            title: "Warning!",
+            text: "Are you sure you want to delete this address? ",
+            icon: "warning",
+            buttons: {
+                cancel: "Cancel",
+                confirm: {
+                    text: "Delete",
+                    value: true,
+                    visible: true,
+                    className: "btn-danger",
+                    closeModal: false // Keep the modal open until we show the next one
+                }
+            },
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                swal("Address Deleted!", "Your address has been successfully deleted.", "success")
+                    .then(() => {
+                        form.submit(); // Submit the form after the success message
+                    });
+            }
+        });
+    }
+            
     </script>
+    
 </div>
 
 <%- include("./profileFooter.ejs") %>

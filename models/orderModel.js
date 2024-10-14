@@ -10,6 +10,7 @@ const orderSchema = new Schema({
         Quantity: { type: Number, required: true },
     }],
     TotalPrice: { type: Number, required: true },
+    DiscountedPrice: { type: Number, default: 0}, // New field for discounted price
     ShippingAddress: { type: Schema.Types.ObjectId, ref: 'Address', required: true }, // Reference to an existing address document
     Status: { type: String, required: true, default: 'Pending' }
 }, {

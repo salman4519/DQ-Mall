@@ -92,6 +92,8 @@ userRoute.post('/profile/address/delete/:id', userController.deleteAddress);
 // Change password
 userRoute.post('/profile/change-password', userController.changePassword);
 userRoute.get('/profile/change-password',userAuth, userController.getUserPass);
+userRoute.get('/profile/wallet',userAuth,userController.getWallet);
+userRoute.get('/wallet-balance',userAuth,userController.walletBalance)
 
 
 
@@ -113,6 +115,7 @@ userRoute.post('/checkout/address/delete/:id', userController.deleteAddressCheck
 userRoute.post('/order',userController.postOrder)
 userRoute.post('/create-order', userController.createRazorpayOrder);
 userRoute.post('/verify-payment', userController.verifyPaymentAndSaveOrder);
+userRoute.post('/apply-coupon',userController.applyCoupon)
 
 userRoute.delete('/cart/:productId', userController.deleteCartItem);
 userRoute.get('/success',userAuth,userController.getSuccess)
