@@ -287,9 +287,9 @@ function displayProducts(products) {
                         <h5 class="card-title">${product.Name}</h5>
                         <p class="card-text">
                             ${offers.length > 0
-                                ? `<span class="text-danger" style="text-decoration: line-through;">$${product.Price.toFixed(2)}</span> 
-                                   <span class="text-success">$${discountedPrice.toFixed(2)}</span>`
-                                : `<span class="">$${product.Price.toFixed(2)}</span>`}
+                                ? `<span class="text-danger" style="text-decoration: line-through;">₹${product.Price.toFixed(2)}</span> 
+                                   <span class="text-success">₹${discountedPrice.toFixed(2)}</span>`
+                                : `<span class="">₹${product.Price.toFixed(2)}</span>`}
                         </p>
 
                         <!-- Conditionally render button or out of stock message -->

@@ -1,15 +1,15 @@
 <%- include("./profilePartial.ejs") %>
 
-<div class="Container my-5">
-    <div id="orders" class="account-section">
-        <h3 class="mb-4">My Orders</h3>
+    <div class="Container my-5">
+        <div id="orders" class="account-section">
+            <h3 class="mb-4">My Orders</h3>
 
-        <% if (orders && orders.length > 0) { %>
-            <div class="row">
-                <% orders.forEach(order => { %>
-                    <div class="col-md-12 mb-5">
-                        <div class="card shadow-sm border-0">
-                            <div class="card-header d-flex justify-content-between align-items-center
+            <% if (orders && orders.length> 0) { %>
+                <div class="row">
+                    <% orders.forEach(order=> { %>
+                        <div class="col-md-12 mb-5">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-header d-flex justify-content-between align-items-center
                                 <% if (order.Status === 'Delivered') { %>
                                     bg-success text-white
                                 <% } else if (order.Status === 'Returned') { %>
@@ -17,153 +17,256 @@
                                 <% } else if (order.Status === 'Cancelled') { %>
                                     bg-danger text-white
                                 <% } %>">
-                                <h5 class="mb-0">Order ID: <%= order.OrderId %></h5>
-                                <span class="badge badge-<%= order.Status === 'Returned' ? 'warning' : order.Status === 'Delivered' ? 'success' : order.Status === 'Pending' ? 'dark' : order.Status === 'Shipped' ? 'primary' :  'danger' %>">
-                                    <%= order.Status %>
-                                </span>
-                            </div>
-
-                            <div class="card-body">
-                                <div class="order-info mb-4">
-                                    <h6><strong>Ordered on:</strong> <%= new Date(order.createdAt).toLocaleDateString() %></h6>
-                                    <h6><strong>Total Price:</strong> $<%= order.TotalPrice.toFixed(2) %></h6>
+                                    <h5 class="mb-0">Order ID: <%= order.OrderId %>
+                                    </h5>
+                                    <span
+                                        class="badge badge-<%= order.Status === 'Returned' ? 'warning' : order.Status === 'Delivered' ? 'success' : order.Status === 'Pending' ? 'dark' : order.Status === 'Shipped' ? 'primary' :  'danger' %>">
+                                        <%= order.Status %>
+                                    </span>
                                 </div>
 
-                                <h6 class="mt-4">Products in this Order:</h6>
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Image</th>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Quantity</th>
-                                            <th scope="col">Price</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% order.Products.forEach(product => { %>
-                                            <tr>
-                                                <td>
-                                                    <img src="/uploads/<%= product.ProductId.Images[0] %>" alt="Product Image" class="product-image" style="width: 80px; height: 80px; object-fit: cover;" />
-                                                </td>
-                                                <td><%= product.ProductId.Name %></td>
-                                                <td><%= product.Quantity %></td>
-                                                <td><%= product.ProductId.Price %></td>
-                                            </tr>
-                                        <% }) %>
-                                    </tbody>
-                                </table>
+                                <div class="card-body">
+                                    <div class="order-info mb-4">
+                                        <h6><strong>Ordered on:</strong>
+                                            <%= new Date(order.createdAt).toLocaleDateString() %>
+                                        </h6>
+                                        <h6><strong>Total Price:</strong> ₹<%= order.TotalPrice.toFixed(2) %>
+                                        </h6>
+                                    </div>
 
-                                <% if (order.Status === 'Pending' || order.Status === 'Shipped') { %>
-                                    <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order.OrderId %>">Cancel Order</button>
-                                <% } else if (order.Status === 'Delivered') { %>
-                                    <button class="btn btn-warning return-order-btn" data-order-id="<%= order.OrderId %>">Return Order</button>
-                                <% } %>
+                                    <h6 class="mt-4">Products in this Order:</h6>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Image</th>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Quantity</th>
+                                                <th scope="col">Price</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% order.Products.forEach(product=> { %>
+                                                <tr>
+                                                    <td>
+                                                        <img src="/uploads/<%= product.ProductId.Images[0] %>"
+                                                            alt="Product Image" class="product-image"
+                                                            style="width: 80px; height: 80px; object-fit: cover;" />
+                                                    </td>
+                                                    <td>
+                                                        <%= product.ProductId.Name %>
+                                                    </td>
+                                                    <td>
+                                                        <%= product.Quantity %>
+                                                    </td>
+                                                    <td>₹<%= product.ProductId.Price.toFixed(2) %>
+                                                    </td>
+                                                </tr>
+                                                <% }) %>
+                                        </tbody>
+                                    </table>
+
+                                    <% if (order.Status==='Pending' || order.Status==='Shipped' ) { %>
+                                        <button class="btn btn-danger cancel-order-btn"
+                                            data-order-id="<%= order.OrderId %>">Cancel Order</button>
+                                        <% } else if (order.Status==='Delivered' ) { %>
+                                            <button class="btn btn-warning return-order-btn"
+                                                data-order-id="<%= order.OrderId %>">Return Order</button>
+                                            <button class="btn btn-primary download-invoice-btn"
+                                                data-order-id="<%= order.OrderId %>">Download Invoice</button>
+                                            <% } else if (order.Status==='Returned' ) { %>
+                                                <button class="btn btn-primary download-invoice-btn"
+                                                    data-order-id="<%= order.OrderId %>">Download Invoice</button>
+                                                <% } else if (order.Status==='Payment Failed' ) { %>
+                                                    <button class="btn btn-warning retry-payment-btn"
+                                                        data-order-id="<%= order.OrderId %>"
+                                                        data-order-price="<%= order.TotalPrice %>"
+                                                        data-razorpay-order-id="<%= order._id %>">Retry
+                                                        Payment</button>
+
+                                                    <% } %>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                <% }) %>
-            </div>
-        <% } else { %>
-            <p>No orders found.</p>
-        <% } %>
+                        <% }) %>
+                </div>
+                <% } else { %>
+                    <p>No orders found.</p>
+                    <% } %>
+        </div>
     </div>
-</div>
 
-<%- include("./profileFooter.ejs") %>
+    <%- include("./profileFooter.ejs") %>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-<script>
-    // Handle cancel order button click
-    document.querySelectorAll('.cancel-order-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            const orderId = this.dataset.orderId;
+        <script>
+            // Handle cancel order button click
+            document.querySelectorAll('.cancel-order-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const orderId = this.dataset.orderId;
 
-            swal({
-                title: "Are you sure?",
-                text: "Do you really want to cancel this order? ",
-                icon: "warning",
-                buttons: {
-                    cancel: "Cancel",
-                    confirm: {
-                        text: "Yes, cancel it!",
-                        value: true,
-                        className: "btn-danger"
-                    }
-                },
-                dangerMode: true,
-            }).then((willCancel) => {
-                if (willCancel) {
-                    // Send request to cancel order
-                    fetch('/cancel-order', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
+                    swal({
+                        title: "Are you sure?",
+                        text: "Do you really want to cancel this order? ",
+                        icon: "warning",
+                        buttons: {
+                            cancel: "Cancel",
+                            confirm: {
+                                text: "Yes, cancel it!",
+                                value: true,
+                                className: "btn-danger"
+                            }
                         },
-                        body: JSON.stringify({ orderId: orderId }),
-                    })
-                    .then(response => response.json()) // Parse the JSON response
-                    .then(data => {
-                        if (data.success) {
-                            swal("Success!", data.message, "success").then(() => {
-                                location.reload(); // Refresh the page to show updated order status
-                            });
-                        } else {
-                            swal("Error!", data.message || 'Failed to cancel order. Please try again.', "error");
+                        dangerMode: true,
+                    }).then((willCancel) => {
+                        if (willCancel) {
+                            // Send request to cancel order
+                            fetch('/cancel-order', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ orderId: orderId }),
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        swal("Success!", data.message, "success").then(() => {
+                                            location.reload(); // Refresh the page to show updated order status
+                                        });
+                                    } else {
+                                        swal("Error!", data.message || 'Failed to cancel order. Please try again.', "error");
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    swal("Error!", 'An error occurred while canceling the order.', "error");
+                                });
                         }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        swal("Error!", 'An error occurred while canceling the order.', "error");
                     });
-                }
+                });
             });
-        });
-    });
 
-    // Handle return order button click
-    document.querySelectorAll('.return-order-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            const orderId = this.dataset.orderId;
+            // Handle return order button click
+            document.querySelectorAll('.return-order-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const orderId = this.dataset.orderId;
 
-            swal({
-                title: "Are you sure?",
-                text: "Do you really want to return this order? ",
-                icon: "warning",
-                buttons: {
-                    cancel: "Cancel",
-                    confirm: {
-                        text: "Yes, return it!",
-                        value: true,
-                        className: "btn-danger"
-                    }
-                },
-                dangerMode: true,
-            }).then((willReturn) => {
-                if (willReturn) {
-                    // Send request to return order
-                    fetch('/return-order', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
+                    swal({
+                        title: "Are you sure?",
+                        text: "Do you really want to return this order? ",
+                        icon: "warning",
+                        buttons: {
+                            cancel: "Cancel",
+                            confirm: {
+                                text: "Yes, return it!",
+                                value: true,
+                                className: "btn-danger"
+                            }
                         },
-                        body: JSON.stringify({ orderId: orderId }),
-                    })
-                    .then(response => response.json()) // Parse the JSON response
-                    .then(data => {
-                        if (data.success) {
-                            swal("Success!", data.message, "success").then(() => {
-                                location.reload(); // Refresh the page to show updated order status
-                            });
-                        } else {
-                            swal("Error!", data.message || 'Failed to return order. Please try again.', "error");
+                        dangerMode: true,
+                    }).then((willReturn) => {
+                        if (willReturn) {
+                            // Send request to return order
+                            fetch('/return-order', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ orderId: orderId }),
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        swal("Success!", data.message, "success").then(() => {
+                                            location.reload(); // Refresh the page to show updated order status
+                                        });
+                                    } else {
+                                        swal("Error!", data.message || 'Failed to return order. Please try again.', "error");
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    swal("Error!", 'An error occurred while returning the order.', "error");
+                                });
                         }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        swal("Error!", 'An error occurred while returning the order.', "error");
                     });
-                }
+                });
             });
-        });
-    });
-</script>
 
+            document.querySelectorAll('.retry-payment-btn').forEach(button => {
+    button.addEventListener('click', function () {
+        const orderId = this.dataset.orderId;
+        const totalPrice = this.dataset.orderPrice;  // Get total price from the data attribute
+        const razorpayOrderId = this.dataset.razorpayOrderId;  // Add razorpay order ID from dataset
+
+        const amountInPaise = Math.round(totalPrice * 100);  // Convert total price to paise
+
+        // Define payment options for Razorpay
+        const options = {
+    "key": "<%= razorpayKeyId %>",  // Razorpay key
+    "amount": amountInPaise,  // Total amount in paise
+    "currency": "INR",
+    "name": "DQ Mall",
+    "description": "Order Payment",
+    "handler": function (paymentResponse) {
+        console.log("Payment response received:", paymentResponse);  // Log the entire payment response
+
+        // Ensure paymentResponse contains the necessary data
+        if (!paymentResponse.razorpay_payment_id) {
+            console.error("Payment response does not contain payment ID.");
+            return swal("Error!", 'Payment failed. Please try again.', "error");
+        }
+
+        const paymentData = {
+            razorpay_order_id: razorpayOrderId || paymentResponse.razorpay_order_id,  // Use the correct order ID
+            razorpay_payment_id: paymentResponse.razorpay_payment_id,  // Capture the payment ID
+            orderId: orderId,  // Pass order ID
+        };
+
+        console.log("Payment successful, verifying...", paymentData); // Log payment data
+
+        // Verify payment on the server
+        fetch('/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(paymentData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Handle success (update order status, etc.)
+                swal("Success!", "Payment verified successfully.", "success");
+            } else {
+                console.log('Verification failed:', data);
+                swal("Error!", 'Failed to verify payment. Please try again.', "error");
+            }
+        })
+        .catch(error => {
+            console.error('Error verifying payment:', error);
+            swal("Error!", 'An error occurred while processing the payment.', "error");
+        });
+    },
+    "theme": { "color": "#F37254" }
+};
+
+// Open the Razorpay dialog to initiate payment
+const rzp1 = new Razorpay(options);
+rzp1.open(); 
+  // Open Razorpay dialog to retry payment
+    });
+});
+
+
+  
+
+            // Handle download invoice button click
+            document.querySelectorAll('.download-invoice-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const orderId = this.dataset.orderId;
+
+                    // Redirect to the invoice download URL
+                    window.location.href = `/order/${orderId}/invoice`;
+                });
+            });
+
+        </script>

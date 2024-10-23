@@ -1,81 +1,627 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance Tracker</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .student-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        .student-list li {
-            margin-bottom: 5px;
-        }
-        .submit-btn {
-            margin-top: 20px;
-        }
-        .result {
-            margin-top: 30px;
-        }
-    </style>
-</head>
-<body>
+<%- include('../layouts/header.ejs') %>
+<%- include('../layouts/sidebar.ejs') %>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      <!-- partial:partials/_navbar.html -->
+      <nav class="navbar p-0 fixed-top d-flex flex-row">
+        <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+          <a class="navbar-brand brand-logo-mini" href="index.html"><img src="/admin/assets/images/logo-mini.svg" alt="logo" /></a>
+        </div>
+        <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+          <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+            <span class="mdi mdi-menu"></span>
+          </button>
+          <ul class="navbar-nav w-100">
+            <li class="nav-item w-100">
+              <form class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
+                <input type="text" class="form-control" placeholder="Search products">
+              </form>
+            </li>
+          </ul>
+          <ul class="navbar-nav navbar-nav-right">
+            <li class="nav-item dropdown d-none d-lg-block">
+              
+              
+              <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="createbuttonDropdown">
+                <h6 class="p-3 mb-0">Projects</h6>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-file-outline text-primary"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject ellipsis mb-1">Software Development</p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-web text-info"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject ellipsis mb-1">UI Development</p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-layers text-danger"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject ellipsis mb-1">Software Testing</p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <p class="p-3 mb-0 text-center">See all projects</p>
+              </div>
+            </li>
+            <li class="nav-item nav-settings d-none d-lg-block">
+              <a class="nav-link" href="#">
+                <i class="mdi mdi-view-grid"></i>
+              </a>
+            </li>
+            <li class="nav-item dropdown border-left">
+              <a class="nav-link count-indicator dropdown-toggle" id="messageDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
+                <i class="mdi mdi-email"></i>
+                <span class="count bg-success"></span>
+              </a>
+              <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="messageDropdown">
+                <h6 class="p-3 mb-0">Messages</h6>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <img src="/admin/assets/images/faces/face4.jpg" alt="image" class="rounded-circle profile-pic">
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject ellipsis mb-1">Mark send you a message</p>
+                    <p class="text-muted mb-0"> 1 Minutes ago </p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <img src="/admin/assets/images/faces/face2.jpg" alt="image" class="rounded-circle profile-pic">
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject ellipsis mb-1">Cregh send you a message</p>
+                    <p class="text-muted mb-0"> 15 Minutes ago </p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <img src="/admin/assets/images/faces/face3.jpg" alt="image" class="rounded-circle profile-pic">
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject ellipsis mb-1">Profile picture updated</p>
+                    <p class="text-muted mb-0"> 18 Minutes ago </p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <p class="p-3 mb-0 text-center">4 new messages</p>
+              </div>
+            </li>
+            <li class="nav-item dropdown border-left">
+              <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
+                <i class="mdi mdi-bell"></i>
+                <span class="count bg-danger"></span>
+              </a>
+              <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
+                <h6 class="p-3 mb-0">Notifications</h6>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-calendar text-success"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject mb-1">Event today</p>
+                    <p class="text-muted ellipsis mb-0"> Just a reminder that you have an event today </p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-settings text-danger"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject mb-1">Settings</p>
+                    <p class="text-muted ellipsis mb-0"> Update dashboard </p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-link-variant text-warning"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject mb-1">Launch Admin</p>
+                    <p class="text-muted ellipsis mb-0"> New admin wow! </p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <p class="p-3 mb-0 text-center">See all notifications</p>
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
+                <div class="navbar-profile">
+                  <img class="img-xs rounded-circle" src="/admin/assets/images/faces/face15.jpg" alt="">
+                  <p class="mb-0 d-none d-sm-block navbar-profile-name">Henry Klein</p>
+                  <i class="mdi mdi-menu-down d-none d-sm-block"></i>
+                </div>
+              </a>
+              <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="profileDropdown">
+                <h6 class="p-3 mb-0">Profile</h6>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-settings text-success"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject mb-1">Settings</p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-logout text-danger"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject mb-1">Log out</p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <p class="p-3 mb-0 text-center">Advanced settings</p>
+              </div>
+            </li>
+          </ul>
+          <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+            <span class="mdi mdi-format-line-spacing"></span>
+          </button>
+        </div>
+      </nav>
 
-    <h2>Mark Attendance - 27/09/2024</h2>
-    
-    <form id="attendance-form">
-        <ul class="student-list">
-            <li><input type="checkbox" id="roshan" name="student" value="Roshan Jabir"> Roshan Jabir (Lated)</li>
-            <li><input type="checkbox" id="adhnan" name="student" value="Adhnan P"> Adhnan P (Lated)</li>
-            <li><input type="checkbox" id="riyaspp" name="student" value="Riyas P P"> Riyas P P</li>
-            <li><input type="checkbox" id="thaha" name="student" value="Thaha Yaseen"> Thaha Yaseen</li>
-            <li><input type="checkbox" id="kuriyan" name="student" value="Kuriyan John"> Kuriyan John</li>
-            <li><input type="checkbox" id="hashim" name="student" value="Muhammed Hashim"> Muhammed Hashim</li>
-            <li><input type="checkbox" id="minhaj" name="student" value="Muhammed Minhaj"> Muhammed Minhaj</li>
-            <li><input type="checkbox" id="shahana" name="student" value="Shahana Sherin"> Shahana Sherin</li>
-            <li><input type="checkbox" id="rafan" name="student" value="Muhammed Rafan M"> Muhammed Rafan M</li>
-            <li><input type="checkbox" id="shamir" name="student" value="Muhammed Shamir A K"> Muhammed Shamir A K</li>
-            <li><input type="checkbox" id="siraajudeen" name="student" value="Muhammed Siraajudeen"> Muhammed Siraajudeen</li>
-            <li><input type="checkbox" id="sharafath" name="student" value="Sharafath Abil Has PP"> Sharafath Abil Has PP</li>
-            <li><input type="checkbox" id="riyas-kp" name="student" value="Muhammed Riyas KP"> Muhammed Riyas KP</li>
-            <li><input type="checkbox" id="rashid" name="student" value="Muhammed Rashid N"> Muhammed Rashid N</li>
-            <li><input type="checkbox" id="nihal" name="student" value="Muhammed Nihal CP"> Muhammed Nihal CP</li>
-            <li><input type="checkbox" id="siyad" name="student" value="Siyad Muhsin K"> Siyad Muhsin K</li>
-            <li><input type="checkbox" id="abhinand" name="student" value="Abhinand SD"> Abhinand SD</li>
-        </ul>
-        <button type="submit" class="submit-btn">Submit Attendance</button>
-    </form>
+      <!-- main  -->
 
-    <div class="result">
-        <h3>Absentees:</h3>
-        <p id="absentees-list">None</p>
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <!-- upper image -->
+      <div class="row">
+        <div class="col-12 grid-margin stretch-card">
+          <div class="card corona-gradient-card">
+            <div class="card-body py-0 px-0 px-sm-3">
+              <div class="row align-items-center">
+                <div class="col-4 col-sm-3 col-xl-2">
+                  <img src="/admin/assets/images/dashboard/Group126@2x.png" class="gradient-corona-img img-fluid" alt="">
+                </div>
+                <div class="col-5 col-sm-7 col-xl-8 p-0">
+                  <h3 class="mb-1 mb-sm-0">Dashboard</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Best Selling Product</h4>
+                    <canvas id="barChart" style="height:250px"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Best Selling Category</h4>
+                    <canvas id="lineChart" style="height:250px"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
+    
+    <div class="row">
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Sales Chart</h4>
+                    <canvas id="areaChart"  style="height:250px"></canvas>
+                    
 
-    <script>
-        const attendanceForm = document.getElementById('attendance-form');
-        const absenteesList = document.getElementById('absentees-list');
-
-        attendanceForm.addEventListener('submit', function(event) {
-            event.preventDefault();
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Order Status Chart</h4>
+                    <canvas id="doughnutChart" style="height:250px"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-12 grid-margin stretch-card">
+          <div class="card">
+              <div class="card-body">
+                  <h4 class="card-title">Delivered Orders</h4>
+                  <p class="card-description">All your delivered orders with their details</p>
+  
+                  <!-- Sales Report Filter Form -->
+                  <form id="salesReportForm" action="/admin/download-sales-report" method="post" class="d-flex justify-content-between align-items-center">
+                      <!-- Filter Options -->
+                      <div class="form-group me-2">
+                          <label class="me-2">View:</label>
+                          <div>
+                              <input type="radio" id="daily" name="reportType" value="daily" checked>
+                              <label for="daily">Daily</label>
+                              <input type="radio" id="monthly" name="reportType" value="monthly" class="ms-2">
+                              <label for="monthly">Monthly</label>
+                              <input type="radio" id="yearly" name="reportType" value="yearly" class="ms-2">
+                              <label for="yearly">Yearly</label>
+                              <input type="radio" id="custom" name="reportType" value="custom" class="ms-2">
+                              <label for="custom">Custom</label>
+                          </div>
+                      </div>
+  
+                      <!-- Date Range for Custom View -->
+                      <div class="form-group me-2 custom-date-range" style="display: none;">
+                          <label for="startDate" class="me-2">Start Date:</label>
+                          <input type="date" id="startDate" name="startDate" class="form-control me-2">
+                          <label for="endDate" class="me-2">End Date:</label>
+                          <input type="date" id="endDate" name="endDate" class="form-control">
+                      </div>
+  
+                      <button id="downloadPDFBtn" type="button" class="btn btn-primary me-2">Download PDF</button>
+                      <button id="downloadExcelBtn" type="button" class="btn btn-secondary">Download Excel</button>
+                  </form>
+  
+                  <div id="loadingIndicator" style="display:none;">Loading...</div>
+                  <div id="errorMessage" style="color: red; display: none;"></div>
+  
+                  <div class="table-responsive mt-3">
+                      <table class="table">
+                          <thead>
+                              <tr>
+                                  <th>No</th>
+                                  <th>Order ID</th>
+                                  <th>Payment Method</th>
+                                  <th>Status</th>
+                                  <th>Total Price</th>
+                                  <th>Discount</th>
+                                  <th>Order Date</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <% if (orders.length > 0) { %>
+                                  <% orders.forEach((order, index) => { %>
+                                      <tr>
+                                          <td><%= index + 1 %></td>
+                                          <td><%= order.OrderId %></td>
+                                          <td><%= order.PaymentMethod %></td>
+                                          <td>
+                                              <span class="badge badge-success status-label"><%= order.Status %></span>
+                                          </td>
+                                          <td>$<%= order.TotalPrice.toFixed(2) %></td>
+                                          <td>
+                                              <% if (order.DiscountedPrice && order.DiscountedPrice > 0) { %>
+                                                  $<%= order.DiscountedPrice.toFixed(2) %>
+                                              <% } else { %>
+                                                  No Discount
+                                              <% } %>
+                                          </td>
+                                          <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                                      </tr>
+                                  <% }) %>
+                              <% } else { %>
+                                  <tr>
+                                      <td colspan="7" class="text-center">No delivered orders found.</td>
+                                  </tr>
+                              <% } %>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <script src="charts.js"></script>
+  <script>
+    async function fetchSalesData() {
+        try {
+            const response = await fetch('/admin/sales-data');
+            const data = await response.json();
             
-            const formData = new FormData(attendanceForm);
-            const students = document.querySelectorAll('input[name="student"]');
-            const absentees = [];
+            // Log the fetched data to check its structure
+            console.log(data);
 
-            students.forEach(student => {
-                if (!student.checked) {
-                    absentees.push(student.value);
+            // Call the functions to draw your charts
+            drawBestSellingProductsChart(data.bestSellingProducts);
+            drawBestSellingCategoriesChart(data.bestSellingCategories);
+            drawMonthlySalesChart(data.monthlySales);
+            drawOrderStatusChart(data.orderStatuses);
+            drawCombinedSalesChart(data.monthlySales); // New function for combined chart
+        } catch (error) {
+            console.error('Error fetching sales data:', error);
+        }
+    }
+
+    // Fetch sales data when the page loads
+    fetchSalesData();
+
+    function drawBestSellingProductsChart(data) {
+        const ctx = document.getElementById('barChart').getContext('2d');
+        const labels = data.map(item => item.productName); // Product names instead of IDs
+        const quantities = data.map(item => item.totalQuantity); // Total quantities
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Best Selling Products',
+                    data: quantities,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function drawBestSellingCategoriesChart(data) {
+        const ctx = document.getElementById('lineChart').getContext('2d');
+        const labels = data.map(item => item._id); // Category names
+        const quantities = data.map(item => item.totalQuantity); // Total quantities
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Best Selling Categories',
+                    data: quantities,
+                    fill: false,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function drawMonthlySalesChart(data) {
+        const ctx = document.getElementById('areaChart').getContext('2d');
+        const labels = data.map(item => `${item._id.month}/${item._id.year}`); // Format month/year
+        const sales = data.map(item => item.totalSales); // Total sales
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Monthly Sales',
+                    data: sales,
+                    fill: true,
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function drawCombinedSalesChart(monthlyData) {
+        const ctx = document.getElementById('areaChart').getContext('2d');
+        
+        // Prepare data for combined chart
+        const labels = monthlyData.map(item => `${item._id.month}/${item._id.year}`);
+        const sales = monthlyData.map(item => item.totalSales);
+        const yearlySales = monthlyData.reduce((acc, item) => {
+            const year = item._id.year;
+            acc[year] = (acc[year] || 0) + item.totalSales; // Aggregate yearly sales
+            return acc;
+        }, {});
+
+        const yearlyLabels = Object.keys(yearlySales); // Extract year labels
+        const yearlyData = Object.values(yearlySales); // Extract corresponding sales data
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Monthly Sales',
+                        data: sales,
+                        fill: true,
+                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Yearly Sales',
+                        data: yearlyData,
+                        fill: false,
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function drawOrderStatusChart(data) {
+        const ctx = document.getElementById('doughnutChart').getContext('2d');
+        const labels = data.map(item => item._id); // Status names
+        const counts = data.map(item => item.count); // Order counts
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Order Statuses',
+                    data: counts,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                }
+            }
+        });
+    }
+</script>
+
+  <script>
+    $(document).ready(function () {
+        // Show or hide custom date range based on selected report type
+        $('input[name="reportType"]').on('change', function () {
+            const isCustom = $(this).val() === 'custom';
+            $('.custom-date-range').toggle(isCustom);
+            
+            // Clear start and end dates if not custom
+            if (!isCustom) {
+                $('#startDate').val('');
+                $('#endDate').val('');
+            }
+        });
+    
+        // Download report in PDF format
+        $('#downloadPDFBtn').on('click', function () {
+            downloadReport('pdf');
+        });
+    
+        // Download report in Excel format
+        $('#downloadExcelBtn').on('click', function () {
+            downloadReport('excel');
+        });
+    
+        // Function to handle report downloading in the desired format
+        function downloadReport(format) {
+            const reportType = $('input[name="reportType"]:checked').val();
+            const startDate = $('#startDate').val();
+            const endDate = $('#endDate').val();
+    
+            // Validate custom date range
+            if (reportType === 'custom') {
+                if (!startDate || !endDate) {
+                    alert("Please select both start and end dates for a custom report.");
+                    return;
+                }
+                if (new Date(startDate) > new Date(endDate)) {
+                    alert("The end date must be after the start date.");
+                    return;
+                }
+            }
+    
+            // Toggle loading indicator
+            toggleLoading(true);
+            $('#errorMessage').hide(); // Hide previous error messages
+    
+            // AJAX request to download the report
+            $.ajax({
+                type: 'POST',
+                url: format==="pdf"?"/admin/download-sales-report":"/admin/download-sales-report-excel",
+                data: JSON.stringify({ reportType, startDate, endDate }),
+                contentType: 'application/json',
+                xhrFields: {
+                    responseType: 'blob' // Expecting a binary response for file download
+                },
+                success: function (blob) {
+                    const link = document.createElement('a');
+                    const url = window.URL.createObjectURL(blob);
+                    link.href = url;
+                    link.download = `sales_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                },
+                error: function (jqXHR) {
+                    let errorMsg = `Failed to download the ${format.toUpperCase()} report.`;
+                    if (jqXHR.responseText) {
+                        errorMsg += `: ${jqXHR.responseText}`; // Include server error message
+                    }
+                    $('#errorMessage').text(errorMsg).show(); // Display error message
+                },
+                complete: function () {
+                    toggleLoading(false); // Turn off loading indicator
                 }
             });
+        }
+    
+        // Function to toggle loading indicator and disable/enable buttons
+        function toggleLoading(isLoading) {
+            $('#downloadPDFBtn, #downloadExcelBtn').prop('disabled', isLoading);
+            $('#loadingIndicator').toggle(isLoading); // Show/hide loading indicator
+        }
+    });
+</script>
 
-            absenteesList.textContent = absentees.length > 0 ? absentees.join(', ') : 'None';
-        });
-    </script>
-
-</body>
-</html>
+    
+  
+  <%- include('../layouts/footer.ejs') %>
+  

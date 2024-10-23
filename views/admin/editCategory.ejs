@@ -108,7 +108,7 @@
           </a>
         </li>
         <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
+          <a class="nav-link" href="/admin/orders">
             <span class="menu-icon">
               <i class="mdi mdi-table-large"></i>
             </span>
@@ -116,7 +116,7 @@
           </a>
         </li>
         <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
+          <a class="nav-link" href="/admin/offers">
             <span class="menu-icon">
               <i class="mdi mdi-chart-bar"></i>
             </span>
@@ -124,21 +124,14 @@
           </a>
         </li>
         <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
+          <a class="nav-link" href="admin/coupon">
             <span class="menu-icon">
               <i class="mdi mdi-contacts"></i>
             </span>
             <span class="menu-title">Coupons</span>
           </a>
         </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
-            <span class="menu-icon">
-              <i class="mdi mdi-security"></i>
-            </span>
-            <span class="menu-title">Deals</span>
-        </a>
-        </li>
+
         <li class="nav-item menu-items">
           <a class="nav-link" href="/admin/Category">
             <span class="menu-icon">
@@ -356,6 +349,11 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title">Edit Category</h4>
+                                <% if (message) { %>
+                                  <div class="alert alert-danger" role="alert">
+                                      <%= message %>
+                                  </div>
+                              <% } %>
                                
                                 <form id="editCategoryForm" action="/admin/categories/edit/<%= category._id %>" method="post" enctype="multipart/form-data">
                                     <!-- Category Information -->

@@ -1,12 +1,17 @@
-// models/Wallet.js
 const mongoose = require("mongoose");
-const { Schema } = mongoose;
 
-const walletSchema = new Schema({
-    UserId: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
-    Balance: { type: Number, default: 0 }
-}, {
-    timestamps: true
+const walletSchema = new mongoose.Schema({
+  UserId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  Balance: { type: Number, default: 0 },
+  Transactions: [
+    {
+      amount: { type: Number, required: true },
+      date: { type: Date, default: Date.now },
+      type: { type: String, enum: ["credit", "debit"], required: true },
+      reason: { type: String }, // Add this line for the reason
+    },
+  ],
 });
 
-module.exports = mongoose.model('Wallet', walletSchema);
+const Wallet = mongoose.model("Wallet", walletSchema);
+module.exports = Wallet;

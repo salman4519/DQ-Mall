@@ -108,7 +108,7 @@
           </a>
         </li>
         <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
+          <a class="nav-link" href="/admin/orders">
             <span class="menu-icon">
               <i class="mdi mdi-table-large"></i>
             </span>
@@ -116,7 +116,7 @@
           </a>
         </li>
         <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
+          <a class="nav-link" href="/admin/offers">
             <span class="menu-icon">
               <i class="mdi mdi-chart-bar"></i>
             </span>
@@ -124,21 +124,14 @@
           </a>
         </li>
         <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
+          <a class="nav-link" href="/admin/coupon">
             <span class="menu-icon">
               <i class="mdi mdi-contacts"></i>
             </span>
             <span class="menu-title">Coupons</span>
           </a>
         </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
-            <span class="menu-icon">
-              <i class="mdi mdi-security"></i>
-            </span>
-            <span class="menu-title">Deals</span>
-        </a>
-        </li>
+
         <li class="nav-item menu-items">
           <a class="nav-link" href="/admin/Category">
             <span class="menu-icon">
@@ -357,6 +350,11 @@
               <div class="card">
                 <div class="card-body">
                   <h4 class="card-title">Edit Product</h4>
+                  <% if (message) { %>
+                    <div class="alert alert-danger" role="alert">
+                        <%= message %>
+                    </div>
+                <% } %>
                   <form action="/admin/products/update/<%= product._id %>" method="POST" enctype="multipart/form-data">
                     <!-- Product Information -->
                     <div class="form-group">
@@ -365,9 +363,15 @@
                     </div>
                     
                     <div class="form-group">
-                      <label for="productSize">Size</label>
-                      <input type="text" class="form-control" id="productSize" name="size" value="<%= product.Size %>">
-                    </div>
+                      <label for="productSize" class="white-text">Size</label>
+                      <select class="form-control black-theme-input" id="productSize" name="size" required>
+                          <option value="" disabled selected>Select Size</option>
+                          <option value="S" <%= product.Size === 'S' ? 'selected' : '' %>>S</option>
+                          <option value="M" <%= product.Size === 'M' ? 'selected' : '' %>>M</option>
+                          <option value="L" <%= product.Size === 'L' ? 'selected' : '' %>>L</option>
+                          <option value="XL" <%= product.Size === 'XL' ? 'selected' : '' %>>XL</option>
+                      </select>
+                  </div>
                   
                     <div class="form-group">
                       <label for="productDescription">Description</label>
@@ -385,12 +389,12 @@
                   
                     <div class="form-group">
                       <label for="productPrice">Price</label>
-                      <input type="number" class="form-control" id="productPrice" name="price" value="<%= product.Price %>" required>
+                      <input type="number" class="form-control" id="productPrice" name="price" value="<%= product.Price %>"  required min="0" step="0.01" oninput="checkValid(this)" required>
                     </div>
                   
                     <div class="form-group">
                       <label for="productQuantity">Quantity</label>
-                      <input type="number" class="form-control" id="productQuantity" name="quantity" value="<%= product.Quantity %>" required>
+                      <input type="number" class="form-control" id="productQuantity" name="quantity" value="<%= product.Quantity %>" required min="0" step="1" oninput="checkValid(this)" required>
                     </div>
                   
                     <!-- Product Image Uploads with Previews and Cropping -->
@@ -493,7 +497,27 @@
 <!-- Include Cropper.js -->
 <!-- Include Cropper.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script>
+  function checkValid(input) {
+      if (input.value < 0) {
+          input.value = 0;
+          Swal.fire({
+              icon: 'error',
+              title: 'Invalid Input',
+              text: 'Negative values are not allowed!',
+              confirmButtonText: 'Okay',
+              background: '#000', // Black background
+              color: '#fff', // White text for better contrast
+              customClass: {
+                  popup: 'black-swal-popup', // Class for popup styling
+                  confirmButton: 'black-swal-button', // Class for confirm button styling
+              }
+          });
+      }
+  }
+</script>
 <script>
   function setupCropper(inputId, previewId, cropModalId, cropImageId, cropBtnId, saveCropBtnId) {
     let cropper;

@@ -34,25 +34,38 @@
 </div>
 
 
-<!-- JavaScript for form validation -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     document.getElementById('changePasswordForm').addEventListener('submit', function(event) {
         const newPassword = document.getElementById('newPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
 
+        // Check if the passwords do not match
         if (newPassword !== confirmPassword) {
-            event.preventDefault();
-            // Display a user-friendly message and highlight the fields
-            alert('New Password and Confirm New Password do not match!');
+            event.preventDefault();  // Prevent form submission
+
+            // Display SweetAlert for the mismatch error
+            Swal.fire({
+                icon: 'error',
+                title: 'Password Mismatch',
+                text: 'New Password and Confirm New Password do not match!',
+                background: '#fff',  // White background
+                color: '#000',       // Black text for contrast
+                confirmButtonColor: '#3085d6', // Customize the button color
+            });
+
+            // Add 'is-invalid' class to both fields to visually indicate the issue
             document.getElementById('newPassword').classList.add('is-invalid');
             document.getElementById('confirmPassword').classList.add('is-invalid');
         } else {
-            // Remove any error highlights if passwords match
+            // Remove the 'is-invalid' class if the passwords match
             document.getElementById('newPassword').classList.remove('is-invalid');
             document.getElementById('confirmPassword').classList.remove('is-invalid');
         }
     });
 </script>
+
 
 
 <%- include("./profileFooter.ejs") %>

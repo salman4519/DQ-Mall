@@ -265,10 +265,10 @@
         
         <p><strong>Price:</strong> 
             <% if (hasOffer) { %>
-                <span style="text-decoration: line-through;">$<%= product.Price %></span> 
-                <strong class="text-success">Now: $<%= discountedPrice %> (<%= discountPercentage %>% off)</strong>
+                <span style="text-decoration: line-through;">₹<%= product.Price %></span> 
+                <strong class="text-success">Now: ₹<%= discountedPrice %> (<%= discountPercentage %>% off)</strong>
             <% } else { %>
-                $<%= product.Price %>
+                ₹<%= product.Price %>
             <% } %>
         </p>
     

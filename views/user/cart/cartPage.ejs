@@ -207,7 +207,7 @@
                                             <%= product.ProductId.Name %>
                                         </h5>
                                         <p class="mb-1">
-                                            Price: $
+                                            Price: ₹
                                             <span class="product-price">
                                                 <% if (product.DiscountedPrice && product.DiscountedPrice <
                                                     product.Price) { %>
@@ -252,7 +252,7 @@
                         <div class="summary">
                             <h4>Summary</h4>
                             <div class="cart-total">
-                                Total: $<span id="cart-total">
+                                Total: ₹<span id="cart-total">
                                     <%= cartTotal.toFixed(2) %>
                                 </span>
                             </div>

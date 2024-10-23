@@ -85,7 +85,7 @@
           </a>
         </li>
         <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
+          <a class="nav-link" href="/admin/orders">
             <span class="menu-icon">
               <i class="mdi mdi-table-large"></i>
             </span>
@@ -93,7 +93,7 @@
           </a>
         </li>
         <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
+          <a class="nav-link" href="/admin/offers">
             <span class="menu-icon">
               <i class="mdi mdi-chart-bar"></i>
             </span>
@@ -101,20 +101,12 @@
           </a>
         </li>
         <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
+          <a class="nav-link" href="/admin/coupon">
             <span class="menu-icon">
               <i class="mdi mdi-contacts"></i>
             </span>
             <span class="menu-title">Coupons</span>
           </a>
-        </li>
-        <li class="nav-item menu-items">
-          <a class="nav-link" href="#">
-            <span class="menu-icon">
-              <i class="mdi mdi-security"></i>
-            </span>
-            <span class="menu-title">Deals</span>
-        </a>
         </li>
         <li class="nav-item menu-items">
           <a class="nav-link" href="/admin/Category">
@@ -341,9 +333,17 @@
                                     </div>
                                     
                                     <div class="form-group">
-                                        <label for="productSize">Size</label>
-                                        <input type="text" class="form-control" id="productSize" name="size">
-                                    </div>
+                                      <label for="productSize">Size</label>
+                                      <select class="form-control" id="productSize" name="size" required>
+                                          <option value="" disabled selected>Select Size</option>
+                
+                                          <option value="S">S</option>
+                                          <option value="M">M</option>
+                                          <option value="L">L</option>
+                                          <option value="XL">XL</option>
+                                         
+                                      </select>
+                                  </div>
                                 
                                     <div class="form-group">
                                         <label for="productDescription">Description</label>
@@ -360,14 +360,14 @@
                                     </div>
                                 
                                     <div class="form-group">
-                                        <label for="productPrice">Price</label>
-                                        <input type="number" class="form-control" id="productPrice" name="price" required>
-                                    </div>
-                                
-                                    <div class="form-group">
-                                        <label for="productQuantity">Quantity</label>
-                                        <input type="number" class="form-control" id="productQuantity" name="quantity" required>
-                                    </div>
+                                      <label for="productPrice">Price</label>
+                                      <input type="number" class="form-control" id="productPrice" name="price" required min="0" step="0.01" oninput="checkValid(this)">
+                                  </div>
+                  
+                                  <div class="form-group">
+                                      <label for="productQuantity">Quantity</label>
+                                      <input type="number" class="form-control" id="productQuantity" name="quantity" required min="0" step="1" oninput="checkValid(this)">
+                                  </div>
                                 
                                     <!-- Product Image Uploads with Previews and Cropping -->
                                     <div class="form-group">
@@ -469,60 +469,102 @@
 
       <!-- Include Cropper.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    function setupCropper(inputId, previewId, cropModalId, cropImageId, cropBtnId, saveCropBtnId) {
-    let cropper;
-    
-    document.getElementById(inputId).addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById(cropImageId).src = e.target.result;
-                document.getElementById(previewId).src = e.target.result;
-                document.getElementById(previewId).style.display = 'block';
-                document.getElementById(cropBtnId).style.display = 'block';
-
-                // Initialize Cropper.js
-                if (cropper) {
-                    cropper.destroy(); // Destroy any existing cropper instance
-                }
-                cropper = new Cropper(document.getElementById(cropImageId), {
-                    aspectRatio: 1, // Set aspect ratio or remove for free cropping
-                    viewMode: 1,
-                    preview: `#${previewId}`
-                });
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    document.getElementById(saveCropBtnId).addEventListener('click', function(event) {
-    event.preventDefault(); // Prevent default if needed
-    if (cropper) {
-        const canvas = cropper.getCroppedCanvas();
-        if (canvas) {
-            document.getElementById(previewId).src = canvas.toDataURL(); // Update preview image
-            $(`#${cropModalId}`).modal('hide').on('hidden.bs.modal', function () {
-            $('.modal-backdrop').remove();
-             }); // Hide the modal using Bootstrap's method
-        } else {
-            console.error('Failed to get cropped canvas');
-        }
-    } else {
-        console.error('Cropper instance not initialized');
-    }
-});
-
-}
-
-// Initialize cropper for each image
-setupCropper('productImage1', 'imagePreview1', 'cropModal1', 'cropImage1', 'cropBtn1', 'saveCropBtn1');
-setupCropper('productImage2', 'imagePreview2', 'cropModal2', 'cropImage2', 'cropBtn2', 'saveCropBtn2');
-setupCropper('productImage3', 'imagePreview3', 'cropModal3', 'cropImage3', 'cropBtn3', 'saveCropBtn3');
-
+  function checkValid(input) {
+      if (input.value < 0) {
+          input.value = 0;
+          Swal.fire({
+              icon: 'error',
+              title: 'Invalid Input',
+              text: 'Negative values are not allowed!',
+              confirmButtonText: 'Okay',
+              background: '#000', // Black background
+              color: '#fff', // White text for better contrast
+              customClass: {
+                  popup: 'black-swal-popup', // Class for popup styling
+                  confirmButton: 'black-swal-button', // Class for confirm button styling
+              }
+          });
+      }
+  }
 </script>
+<script>
+  function setupCropper(inputId, previewId, cropModalId, cropImageId, cropBtnId, saveCropBtnId, uploadUrl) {
+      let cropper;
+  
+      document.getElementById(inputId).addEventListener('change', function() {
+          const file = this.files[0];
+          if (file) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                  document.getElementById(cropImageId).src = e.target.result;
+                  document.getElementById(previewId).src = e.target.result;
+                  document.getElementById(previewId).style.display = 'block';
+                  document.getElementById(cropBtnId).style.display = 'block';
+  
+                  // Initialize Cropper.js
+                  if (cropper) {
+                      cropper.destroy(); // Destroy any existing cropper instance
+                  }
+                  cropper = new Cropper(document.getElementById(cropImageId), {
+                      aspectRatio: 1, // Set aspect ratio or remove for free cropping
+                      viewMode: 1,
+                      preview: `#${previewId}`
+                  });
+              };
+              reader.readAsDataURL(file);
+          }
+      });
+  
+      document.getElementById(saveCropBtnId).addEventListener('click', function(event) {
+          event.preventDefault(); // Prevent default if needed
+          if (cropper) {
+              const canvas = cropper.getCroppedCanvas();
+              if (canvas) {
+                  const croppedImageDataUrl = canvas.toDataURL(); // Get cropped image as Data URL
+                  document.getElementById(previewId).src = croppedImageDataUrl; // Update preview image
+  
+                  // Convert Data URL to Blob
+                  canvas.toBlob(function(blob) {
+                      const formData = new FormData();
+                      formData.append('croppedImage', blob, 'cropped-image.png'); // Append the image blob
+  
+                      // Send the cropped image to the server
+                      fetch(uploadUrl, {
+                          method: 'POST',
+                          body: formData
+                      })
+                      .then(response => response.json())
+                      .then(data => {
+                          console.log('Success:', data);
+                          // Handle success (e.g., show a message or update the UI)
+                      })
+                      .catch((error) => {
+                          console.error('Error:', error);
+                          // Handle error (e.g., show an error message)
+                      });
+                  });
+  
+                  $(`#${cropModalId}`).modal('hide').on('hidden.bs.modal', function () {
+                      $('.modal-backdrop').remove();
+                  }); // Hide the modal using Bootstrap's method
+              } else {
+                  console.error('Failed to get cropped canvas');
+              }
+          } else {
+              console.error('Cropper instance not initialized');
+          }
+      });
+  }
+  
+  // Initialize cropper for each image with a unique upload URL
+  setupCropper('productImage1', 'imagePreview1', 'cropModal1', 'cropImage1', 'cropBtn1', 'saveCropBtn1', '/upload-url-for-product1');
+  setupCropper('productImage2', 'imagePreview2', 'cropModal2', 'cropImage2', 'cropBtn2', 'saveCropBtn2', '/upload-url-for-product2');
+  setupCropper('productImage3', 'imagePreview3', 'cropModal3', 'cropImage3', 'cropBtn3', 'saveCropBtn3', '/upload-url-for-product3');
+  </script>
+  
 
 <%- include('../layouts/footer.ejs') %>
 
