@@ -282,7 +282,7 @@
                                   </div>
                               </div>
                           </td>
-                            <td>$<%= order.TotalPrice.toFixed(2) %>
+                            <td>₹<%= order.TotalPrice.toFixed(2) %>
                             </td>
                             <td>
                               <button class="btn btn-primary view-order-btn" data-order-id="<%= order.OrderId %>"
@@ -600,7 +600,7 @@
             <p><strong>Order ID:</strong> ${order.OrderId}</p>
             <p><strong>Payment Method:</strong> ${order.PaymentMethod || 'N/A'}</p>
             <p><strong>Status:</strong> <label class="badge badge-${order.Status === 'Returned' ? 'warning' :order.Status === 'Delivered' ? 'success' : order.Status === 'Pending' ? 'dark' : order.Status === 'Shipped' ? 'primary' : 'danger'}">${order.Status}</label></p>
-            <p><strong>Total Price:</strong> $${totalPrice}</p>
+            <p><strong>Total Price:</strong> ₹${totalPrice}</p>
             <h5>Products:</h5>
             <ul>
               ${order.Products.map(product => `

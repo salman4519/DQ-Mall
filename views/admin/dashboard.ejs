@@ -320,10 +320,10 @@
                                           <td>
                                               <span class="badge badge-success status-label"><%= order.Status %></span>
                                           </td>
-                                          <td>$<%= order.TotalPrice.toFixed(2) %></td>
+                                          <td>₹<%= order.TotalPrice.toFixed(2) %></td>
                                           <td>
                                               <% if (order.DiscountedPrice && order.DiscountedPrice > 0) { %>
-                                                  $<%= order.DiscountedPrice.toFixed(2) %>
+                                                ₹<%= order.DiscountedPrice.toFixed(2) %>
                                               <% } else { %>
                                                   No Discount
                                               <% } %>

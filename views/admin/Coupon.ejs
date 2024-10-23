@@ -245,10 +245,10 @@
                                           <td><%= coupon.discountPercentage || 'N/A' %></td>
                           
                                           <!-- Display Maximum Discount Amount -->
-                                          <td>$<%= coupon.maxDiscountAmount || 'N/A' %></td>
+                                          <td>₹<%= coupon.maxDiscountAmount || 'N/A' %></td>
                           
                                           <!-- Display Minimum Purchase -->
-                                          <td>$<%= coupon.minPurchase || 'N/A' %></td>
+                                          <td>₹<%= coupon.minPurchase || 'N/A' %></td>
                           
                                           <!-- Display Expiry Date -->
                                           <td><%= coupon.expiryDate ? new Date(coupon.expiryDate).toDateString() : 'N/A' %></td>
