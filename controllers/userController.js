@@ -1814,7 +1814,7 @@ const getWallet = async (req, res) => {
     const wallet = await Wallet.findOne({ UserId: userId });
 
     if (!wallet) {
-      return res.render("wallet", {
+      return res.render("user/profile/userWallet", {
         balance: 0,
         transactions: [], // Pass an empty array if no wallet is found
       });
