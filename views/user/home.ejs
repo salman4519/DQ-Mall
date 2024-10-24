@@ -142,7 +142,7 @@
         <h2 class="text-center mb-4">Shop by Category</h2>
         <div class="row text-center">
             <% categories.forEach(category => { %>
-                <div class="row row-cols-1col-md-3 mb-3">
+                <div class="col-12 col-md-3 mb-3">
                     <div class="card shadow-sm border-0 category-card">
                         <% if (category.imageUrl) { %>
                             <img src="<%= category.imageUrl %>" class="card-img-top" alt="<%= category.name %>">
