@@ -1863,7 +1863,7 @@ const walletBalance = async (req, res) => {
     res.json({ balance: wallet.Balance });
   } catch (error) {
     console.error("Error fetching wallet balance:", error);
-    res.status(500).json({ message: "Error fetching wallet balance" });
+    res.status(500).json({ message: "0" });
   }
 };
 

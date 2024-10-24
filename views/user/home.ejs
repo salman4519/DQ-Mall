@@ -16,7 +16,7 @@
         .cover-card {
             position: relative;
             height: 600px;
-            background: url('/users/images/cover3.jpg') center/cover no-repeat;
+            background: url('/users/images/logo3.png') center/cover no-repeat;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -74,41 +74,58 @@
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand d-flex align-items-center" href="/shop">
-            <!-- Logo Image -->
-            <img src="/users/images/logo2.png" alt="Kenza Store Logo" class="navbar-brand-logo">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/home"><i class="bi bi-house"></i></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/shop"><i class="bi bi-shop"></i></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/wishlist"><i class="bi bi-bag-heart"></i></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/cart"><i class="bi bi-cart-dash"></i></a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle"></i> <!-- User Profile Icon -->
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="/profile">Profile</a></li>
-                        <li><a class="dropdown-item" href="/logout">Logout</a></li>
+    <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="/shop">
+                <!-- Logo Image -->
+                <img src="/users/images/logo2.png" alt="Kenza Store Logo" class="navbar-brand-logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/home"><i class="bi bi-house"></i></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/shop"><i class="bi bi-shop"></i></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/wishlist"><i class="bi bi-bag-heart"></i></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cart"><i class="bi bi-cart-dash"></i></a>
+                        </li>
+    
+                        <!-- User profile icon for medium and larger screens -->
+                        <li class="nav-item d-none d-md-block">
+                            <a class="nav-link" href="/profile"><i class="bi bi-person-circle"></i></a>
+                        </li>
+    
+                        <!-- Dropdown for small screens only -->
+                        <li class="nav-item dropdown d-md-none">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle"></i> <!-- User Profile Icon -->
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                            </ul>
+                        </li>
                     </ul>
-                </li>
-            </ul>
+                </div>
+            </div>
         </div>
     </nav>
+    
+    
+
 
     <!-- Cover Image Section -->
     <div class="cover-card">
@@ -125,7 +142,7 @@
         <h2 class="text-center mb-4">Shop by Category</h2>
         <div class="row text-center">
             <% categories.forEach(category => { %>
-                <div class="col-md-3 mb-3">
+                <div class="row row-cols-1col-md-3 mb-3">
                     <div class="card shadow-sm border-0 category-card">
                         <% if (category.imageUrl) { %>
                             <img src="<%= category.imageUrl %>" class="card-img-top" alt="<%= category.name %>">
@@ -134,7 +151,7 @@
                         <% } %>
                         <div class="card-body">
                             <h5 class="card-title"><%= category.name %></h5>
-                            <a href="/category/<%= category._id %>/products" class="btn btn-outline-primary">Shop Now</a>
+                            <a href="/category/<%= category._id %>/products" class="btn btn-outline-success">Shop Now</a>
                         </div>
                     </div>
                 </div>
@@ -149,25 +166,25 @@
                 <div class="col-md-4">
                     <h5>Contact Us</h5>
                     <p>
-                        Email: <a href="mailto:support@example.com" class="text-light">support@example.com</a><br>
-                        Phone: +91 123 456 7890<br>
-                        Address: 1234 Street Name, City, State, 56789
+                        Email: <a href="mailto:salmanfarishassan4519@gmail.com" class="text-light">salmanfarishassan4519@gmail.com</a><br>
+                        Phone: +91 9562019132<br>
+                        Address: Thekkil Ferry, Kasaragod, Kerala, 671541
                     </p>
                 </div>
                 <div class="col-md-4">
                     <h5>Quick Links</h5>
                     <ul class="list-unstyled">
                         <li><a href="/" class="text-light">Home</a></li>
-                        <li><a href="/about" class="text-light">About Us</a></li>
-                        <li><a href="/services" class="text-light">Services</a></li>
-                        <li><a href="/contact" class="text-light">Contact</a></li>
+                        <li><a href="" class="text-light">About Us</a></li>
+                        <li><a href="" class="text-light">Services</a></li>
+                        <li><a href="" class="text-light">Contact</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4">
                     <h5>Follow Us</h5>
-                    <a href="#" class="text-light me-2"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="text-light me-2"><i class="bi bi-twitter"></i></a>
-                    <a href="#" class="text-light"><i class="bi bi-instagram"></i></a>
+                    <a href="" class="text-light me-2"><i class="bi bi-facebook"></i></a>
+                    <a href="" class="text-light me-2"><i class="bi bi-twitter"></i></a>
+                    <a href="" class="text-light"><i class="bi bi-instagram"></i></a>
                 </div>
             </div>
             <hr class="bg-light my-4">
