@@ -1,7 +1,9 @@
 A fully functional eCommerce platform built using Node.js, Express.js, MongoDB, and EJS templating. This application offers a seamless shopping experience with robust admin controls, wallet integration, Razorpay payments, and detailed order management.
 
 🚀 Key Features
+
 👤 User Side
+
 🔐 Secure authentication with JWT and OTP
 
 📦 Browse products with category filtering
@@ -19,6 +21,8 @@ A fully functional eCommerce platform built using Node.js, Express.js, MongoDB, 
 📃 Track orders with statuses: Pending, Shipping, Delivered, Cancelled, Returned
 
 🛠️ Admin Side
+
+
 📊 Dashboard with sales and order analytics
 
 📁 Downloadable Excel reports including discounts and total sales
@@ -32,6 +36,8 @@ A fully functional eCommerce platform built using Node.js, Express.js, MongoDB, 
 📈 Visual reports: Best-selling product/category, monthly/yearly sales, order status distribution
 
 🧰 Tech Stack
+
+
 Backend: Node.js, Express.js
 
 Templating Engine: EJS
@@ -45,6 +51,8 @@ Payment Gateway: Razorpay
 Other Libraries: SweetAlert, Multer, ExcelJS, Chart.js
 
 📌 Use Cases
+
+
 Sell physical or digital products online
 
 Manage discounts and payments with ease
