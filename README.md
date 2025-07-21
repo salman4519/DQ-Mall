@@ -4,7 +4,7 @@ A fully functional eCommerce platform built using Node.js, Express.js, MongoDB, 
 
 👤 User Side
 
-🔐 Secure authentication with JWT and OTP
+🔐 Secure authentication with JWT and  OTP
 
 📦 Browse products with category filtering
 
