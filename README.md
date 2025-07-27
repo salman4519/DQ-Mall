@@ -1,6 +1,6 @@
 A fully functional eCommerce platform built using Node.js, Express.js, MongoDB, and EJS templating. This application offers a seamless shopping experience with robust admin controls, wallet integration, Razorpay payments, and detailed order management.
 
-🚀 Key Features
+🚀 Key Features 
 
 👤 User Side
 
